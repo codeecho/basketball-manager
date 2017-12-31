@@ -5,7 +5,7 @@ import Standings from '../containers/Standings';
 export default function Home(props){
 
     if(!props.teams){
-        return <button onClick={props.loadDemoData}/>
+        return <button onClick={props.loadDemoData}>Load Demo Data</button>
     }else{
         return (
             <table>

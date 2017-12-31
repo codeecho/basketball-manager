@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
 import { advanceEpic } from './advanceEpic';
-//import { loadDemoDataEpic } from './loadDemoDataEpic';
+import { loadDemoDataEpic } from './loadDemoDataEpic';
 
 const debugEpic = (action$, store) =>
   action$
@@ -11,7 +11,7 @@ const debugEpic = (action$, store) =>
 const rootEpic = combineEpics(
   debugEpic,
   advanceEpic,
-//  loadDemoDataEpic
+  loadDemoDataEpic
 );
 
 export default rootEpic;

@@ -3,13 +3,18 @@ import Standings from '../pages/Standings';
 
 const mapStateToProps = (state, ownProps) => {
 
+    const {gameState, teams} = state;
+
   const standings = state.standings.map(standing => {
-     const team = state.teams.find(team => team.id === standing.teamId);
+     const team = teams.find(team => team.id === standing.teamId);
      return Object.assign({}, standing, {team});
   });
+  
+  const {teamId} = gameState;
 
   return {
-    standings
+    standings,
+    teamId
   };
 };
 

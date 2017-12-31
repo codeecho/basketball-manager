@@ -1,5 +1,8 @@
 import { Observable } from 'rxjs';
 import * as actions from '../actions';
+import Randomizer from '../utils/Randomizer';
+
+const randomizer = new Randomizer();
 
 export const advanceEpic = (action$, store) =>
   action$
@@ -10,9 +13,10 @@ export const advanceEpic = (action$, store) =>
         const fixtures = state.fixtures[state.gameState.round];
         
         const results = fixtures.map(fixture => {
+            const homeWin = randomizer.getBoolean();
             return {
-                winnerId: fixture.homeId,
-                loserId: fixture.awayId
+                winnerId: homeWin ? fixture.homeId : fixture.awayId,
+                loserId: homeWin ? fixture.awayId: fixture.homeId
             }
         });
         

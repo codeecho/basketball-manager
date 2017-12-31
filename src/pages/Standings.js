@@ -5,7 +5,7 @@ import TeamLink from '../components/TeamLink';
 
 export default function Home(props){
     
-    const {standings} = props;
+    const {standings, teamId} = props;
     
     return (
         <PageWrapper>
@@ -19,7 +19,7 @@ export default function Home(props){
                     </tr>
                 </thead>
                 <tbody>
-                    { standings.map(standing => <Standing {...standing} key={standing.teamId} />) }
+                    { standings.map(standing => <Standing {...standing} highlight={standing.teamId === teamId} key={standing.teamId} />) }
                 </tbody>
             </table>
         </PageWrapper>
@@ -28,10 +28,11 @@ export default function Home(props){
 }
 
 function Standing(props){
-    const { team, played, won, lost} = props;
+    const { team, played, won, lost, highlight} = props;
     const teamHref = `#/team/${team.id}`;
+    const style = highlight ? {color: 'red'} : undefined;
     return (
-        <tr>
+        <tr style={style}>
             <td>
                 <TeamLink team={team} />
             </td>
