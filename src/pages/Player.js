@@ -11,7 +11,7 @@ export default function Player(props){
         <PageWrapper>
             <div>
                 <h3>{player.name}</h3>
-                <p>Team: <TeamLink team={team}/></p>
+                <p>Team: { team ? <TeamLink team={team}/> : 'Free Agent'}</p>
             </div>
         </PageWrapper>
     );

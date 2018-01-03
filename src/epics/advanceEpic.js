@@ -1,24 +1,22 @@
 import { Observable } from 'rxjs';
 import * as actions from '../actions';
 import Randomizer from '../utils/Randomizer';
+import { GAME_STATE_REGULAR_SEASON, GAME_STATE_END_OF_SEASON } from '../constants';
 
 const randomizer = new Randomizer();
 
 export const advanceEpic = (action$, store) =>
   action$
     .filter(action => action.type === actions.ADVANCE)
-    .debounceTime(500)
-    .switchMap(() => {
+    .debounceTime(0)
+    .switchMap(({seed}) => {
         const state = store.getState();
-        const fixtures = state.fixtures[state.gameState.round];
         
-        const results = fixtures.map(fixture => {
-            const homeWin = randomizer.getBoolean();
-            return {
-                winnerId: homeWin ? fixture.homeId : fixture.awayId,
-                loserId: homeWin ? fixture.awayId: fixture.homeId
-            }
-        });
+        const stage = state.gameState.stage
         
-        return Observable.of(actions.saveResults(results));
+        if(stage === GAME_STATE_REGULAR_SEASON){
+            return Observable.of(actions.playNextRound(seed));   
+        }else if(stage === GAME_STATE_END_OF_SEASON){
+            return Observable.of(actions.endSeason(seed));               
+        }
     });

@@ -1,31 +1,40 @@
 {
     "teams": [
-        {"id": 1, "name": "Team 1"},
-        {"id": 2, "name": "Team 2"},
-        {"id": 3, "name": "Team 3"},
-        {"id": 4, "name": "Team 4"}
+        {"id": 1, "name": "Golden State Warriors"},
+        {"id": 2, "name": "Cleveland Cavaliers"},
+        {"id": 3, "name": "Minnesota Timberwolves"},
+        {"id": 4, "name": "Boston Celtics"}
     ],
     "players": [
-        {"id": 1, "teamId": 1, "name": "Player 1"},
-        {"id": 2, "teamId": 1, "name": "Player 2"},
-        {"id": 3, "teamId": 1, "name": "Player 3"},
-        {"id": 4, "teamId": 1, "name": "Player 4"},
-        {"id": 5, "teamId": 1, "name": "Player 5"},
-        {"id": 6, "teamId": 2, "name": "Player 6"},
-        {"id": 7, "teamId": 2, "name": "Player 7"},
-        {"id": 8, "teamId": 2, "name": "Player 8"},
-        {"id": 9, "teamId": 2, "name": "Player 9"},
-        {"id": 10, "teamId": 2, "name": "Player 10"},
-        {"id": 11, "teamId": 3, "name": "Player 11"},
-        {"id": 12, "teamId": 3, "name": "Player 12"},
-        {"id": 13, "teamId": 3, "name": "Player 13"},
-        {"id": 14, "teamId": 3, "name": "Player 14"},
-        {"id": 15, "teamId": 3, "name": "Player 15"},
-        {"id": 16, "teamId": 4, "name": "Player 16"},
-        {"id": 17, "teamId": 4, "name": "Player 17"},
-        {"id": 18, "teamId": 4, "name": "Player 18"},
-        {"id": 19, "teamId": 4, "name": "Player 19"},
-        {"id": 20, "teamId": 4, "name": "Player 20"}
+        {"id": 1, "teamId": 1, "name": "Steph Curry", "ability": 84},
+        {"id": 2, "teamId": 1, "name": "Kevin Durant", "ability": 87},
+        {"id": 3, "teamId": 1, "name": "Draymond Green", "ability": 80},
+        {"id": 4, "teamId": 1, "name": "Klay Thompson", "ability": 78},
+        {"id": 5, "teamId": 1, "name": "Jordon Bell", "ability": 67},
+        
+        {"id": 6, "teamId": 2, "name": "LeBron James", "ability": 90},
+        {"id": 7, "teamId": 2, "name": "Kevin Love", "ability": 75},
+        {"id": 8, "teamId": 2, "name": "Isiah Thomas", "ability": 80},
+        {"id": 9, "teamId": 2, "name": "JR Smith", "ability": 73},
+        {"id": 10, "teamId": 2, "name": "Jae Crowder", "ability": 73},
+        
+        {"id": 11, "teamId": 3, "name": "Karl Anthony Towns", "ability": 77},
+        {"id": 12, "teamId": 3, "name": "Jimmy Butler", "ability": 78},
+        {"id": 13, "teamId": 3, "name": "Andrew Wiggins", "ability": 76},
+        {"id": 14, "teamId": 3, "name": "Jeff Teague", "ability": 72},
+        {"id": 15, "teamId": 3, "name": "Taj Gibson", "ability": 73},
+        
+        {"id": 16, "teamId": 4, "name": "Kyrie Irving", "ability": 82},
+        {"id": 17, "teamId": 4, "name": "Gordon Hayward", "ability": 79},
+        {"id": 18, "teamId": 4, "name": "Jason Tatum", "ability": 71},
+        {"id": 19, "teamId": 4, "name": "Jaylen Brown", "ability": 70},
+        {"id": 20, "teamId": 4, "name": "Al Horford", "ability": 77},
+        
+        {"id": 21, "teamId": null, "name": "Jason King", "ability": 62},
+        {"id": 22, "teamId": null, "name": "John Martin", "ability": 60},
+        {"id": 23, "teamId": null, "name": "Michael Porter", "ability": 53},
+        {"id": 24, "teamId": null, "name": "Tony Carter", "ability": 64},
+        {"id": 25, "teamId": null, "name": "Paul Mendoza", "ability": 59}
     ],
     "standings": [
         {"teamId": 1, "played": 0, "won": 0, "lost": 0},

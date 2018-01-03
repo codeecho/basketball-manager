@@ -16,7 +16,7 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
       loadDemoData: () => dispatch(loadDemoData()),
-      setTeam: (teamId) => dispatch(setTeam(teamId))
+      setTeam: (teamId, username) => dispatch(setTeam(teamId, username))
   };
 };
 

@@ -11,8 +11,13 @@ export default function PageWrapper(props){
             <div>
                 <a href="#/">Home</a>
                 <a href={teamHref}>My Team</a>
+                <a href="#/freeAgents">Free Agents</a>
                 <span>{props.stage}</span>
                 <UserActions {...props} />
+                {!props.isOnlineGame && <button onClick={props.hostOnlineGame}>Host Online Game</button>}
+                {!props.isOnlineGame && <button onClick={props.joinOnlineGame}>Join Online Game</button>}
+                {props.isOnlineGame && <OnlineGameStatus {...props}/>}
+                <button onClick={props.newGame}>New Game</button>
                 <Log messages={props.logMessages} />
             </div>
             <div>
@@ -21,6 +26,20 @@ export default function PageWrapper(props){
         </div>
     )
     
+}
+
+function OnlineGameStatus(props){
+    const {onlineGame} = props;
+    const {numberOfPlayers, playersReady} = onlineGame;
+    const playersNotReady = numberOfPlayers - playersReady.length;
+    const waitingForPlayers = playersNotReady > 0;
+    const canAdvance = !waitingForPlayers && onlineGame.isHost;
+    return (
+        <div>
+        <span> Game Id: {props.onlineGame.id} </span>
+        {waitingForPlayers && <span>Waiting for {playersNotReady} players</span>}
+        </div>
+    );
 }
 
 function Log(props){
@@ -40,26 +59,8 @@ function LogMessage(props){
 }
 
 function UserActions(props){
-    const {stage} = props;
-    switch(stage){
-        case(GAME_STATE_REGULAR_SEASON): return <RegularSeasonUserActions {...props} />
-        case(GAME_STATE_END_OF_SEASON): return <EndOfSeasonUserActions {...props} />
-        default: return null;
-    }
-}
-
-function RegularSeasonUserActions(props){
-    return (
-        <div>
-            <button onClick={props.advance}>Play Next Round</button>        
-        </div>
-    );
-}
-
-function EndOfSeasonUserActions(props){
-    return (
-        <div>
-            <button onClick={props.endSeason}>End Season</button>        
-        </div>
-    );    
+    return (<div>
+        {!props.isOnlineGame && <button onClick={props.advance}>Play Next Round</button>}
+        {props.isOnlineGame && <button onClick={props.playerReady}>Play Next Round</button>}
+    </div>)
 }
