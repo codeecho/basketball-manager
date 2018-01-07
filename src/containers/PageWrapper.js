@@ -6,13 +6,14 @@ import { advance, endSeason, hostOnlineGame, joinOnlineGame, serverPlayerReady, 
 const mapStateToProps = (state, ownProps) => {
 
   const {gameState, onlineGame} = state;
-  const {stage, logMessages, teamId} = gameState;
+  const {stage, logMessages, teamId, year} = gameState;
   const isOnlineGame = onlineGame.id !== undefined;
 
   return {
     stage,
     logMessages,
     teamId,
+    year,
     isOnlineGame,
     onlineGame
   };
@@ -22,7 +23,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
       advance: () => {dispatch(advance())},
       playerReady: () => {dispatch(serverPlayerReady())},
-      endSeason: () => dispatch(endSeason()),
       hostOnlineGame: () => dispatch(hostOnlineGame()),
       joinOnlineGame: () => {
           const gameId = prompt('Please enter game id: ');

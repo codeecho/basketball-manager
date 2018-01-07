@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Table } from 'react-bootstrap';
+
 import PageWrapper from '../containers/PageWrapper';
 import TeamLink from '../components/TeamLink';
 
@@ -9,7 +11,7 @@ export default function Home(props){
     
     return (
         <PageWrapper>
-            <table>
+            <Table striped hover>
                 <thead>
                     <tr>
                         <th></th>
@@ -21,7 +23,7 @@ export default function Home(props){
                 <tbody>
                     { standings.map(standing => <Standing {...standing} highlight={standing.teamId === teamId} key={standing.teamId} />) }
                 </tbody>
-            </table>
+            </Table>
         </PageWrapper>
     );
     

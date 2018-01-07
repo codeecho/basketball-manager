@@ -1,11 +1,16 @@
 import { LOAD_GAME_DATA, SET_TEAM, SAVE_RESULTS, END_SEASON, ADD_LOG_MESSAGE, REMOVE_LOG_MESSAGE, 
     HOST_ONLINE_GAME, CLIENT_USER_CONNECTED, CLIENT_USER_DISCONNECTED, CLIENT_PLAYER_READY, JOIN_ONLINE_GAME,
-    CLIENT_ADVANCE, NEW_GAME, SIGN_FREE_AGENT} from './actions';
-import { GAME_STATE_REGULAR_SEASON, GAME_STATE_END_OF_SEASON } from './constants';
+    CLIENT_ADVANCE, NEW_GAME, SIGN_FREE_AGENT, HANDLE_EXPIRING_CONTRACTS, CREATE_FREE_AGENTS, AI_SIGN_FREE_AGENTS,
+    EXTEND_CONTRACT, DO_DRAFT} from './actions';
+import { GAME_STATE_REGULAR_SEASON, GAME_STATE_POST_SEASON, GAME_STATE_END_OF_SEASON, 
+    GAME_STATE_CONTRACT_NEGOTIATIONS, GAME_STATE_FREE_AGENCY, GAME_STATE_DRAFT } from './constants';
 
 import Randomizer from './utils/Randomizer';
+import {toast} from 'react-toastify';
+import DraftService from './services/DraftService';
 
 const randomizer = new Randomizer();
+const draftService = new DraftService();
 
 const currentGameId = localStorage.getItem('currentGameId');
 
@@ -24,6 +29,7 @@ const newGameState = {
         id: randomizer.getRandomString(6).toLowerCase(),
         stage: GAME_STATE_REGULAR_SEASON,
         round: 0,
+        year: undefined,
         teamId: undefined,
         logMessages: []
     },
@@ -48,7 +54,11 @@ const reducer = (state = initialState, action) => {
         }
         case LOAD_GAME_DATA: {
             const {data} = action;
-            return Object.assign({}, state, data);
+            data.draft = draftService.createDraftClass(data.nextPlayerId, data.teams.length*2);
+            data.nextPlayerId = data.nextPlayerId + data.draft.length;
+            const newState = Object.assign({}, state, data);
+            newState.gameState.year = data.options.startYear;
+            return newState;
         }
         case SET_TEAM: {
             const {teamId, username} = action;
@@ -70,7 +80,7 @@ const reducer = (state = initialState, action) => {
             });
             standings.sort((a, b) => b.won - a.won);
             const round = state.gameState.round + 1;
-            const stage = round < state.fixtures.length ? GAME_STATE_REGULAR_SEASON : GAME_STATE_END_OF_SEASON;
+            const stage = round < state.fixtures.length ? GAME_STATE_REGULAR_SEASON : GAME_STATE_POST_SEASON;
             const gameState = Object.assign({}, state.gameState, { round, stage });
             const newState = Object.assign({}, state, { standings, gameState });
             localStorage.setItem('currentGameId', state.gameState.id);
@@ -80,7 +90,8 @@ const reducer = (state = initialState, action) => {
         case END_SEASON: {
             const round = 0;
             const stage = GAME_STATE_REGULAR_SEASON;
-            const gameState = Object.assign({}, state.gameState, { round, stage });
+            const year = state.gameState.year + 1;
+            const gameState = Object.assign({}, state.gameState, { round, stage, year});
             const standings = state.standings.map(standing => Object.assign({}, standing, {played: 0, won: 0, lost: 0}));
             return Object.assign({}, state, { standings, gameState });
         }
@@ -121,12 +132,77 @@ const reducer = (state = initialState, action) => {
         }
         case SIGN_FREE_AGENT: {
             const {playerId} = action;
+            const year = state.gameState.year;
             const teamId = state.gameState.teamId;
             const players = state.players.map(player => {
                 if(player.id !== playerId) return player;
-                return Object.assign({}, player, teamId);
+                return Object.assign({}, player, {teamId, contractExpiry: year+3});
             });
-            return Object.assign({}, state, players);
+            return Object.assign({}, state, {players});
+        }
+        case EXTEND_CONTRACT: {
+            const {playerId} = action;
+            const year = state.gameState.year;
+            const players = state.players.map(player => {
+                if(player.id !== playerId) return player;
+                return Object.assign({}, player, {contractExpiry: year+3});
+            });
+            return Object.assign({}, state, {players});
+        }
+        case HANDLE_EXPIRING_CONTRACTS: {
+            const team = state.teams.find(team => team.id === state.gameState.teamId);
+            const playersWithExpiringContracts = state.players.filter(player => player.teamId === state.gameState.teamId && player.contractExpiry === state.gameState.year);
+            
+            playersWithExpiringContracts.forEach(player => toast.info(`${player.name}'s contract is expiring`));
+            
+            const stage = GAME_STATE_CONTRACT_NEGOTIATIONS;
+            const gameState = Object.assign({}, state.gameState, {stage});
+            return Object.assign({}, state, {gameState});
+        }
+        case CREATE_FREE_AGENTS: {
+            const year = state.gameState.year;
+            const players = state.players.map(player => {
+                if(player.contractExpiry !== year) return player;
+                
+                if(player.teamId == state.gameState.teamId) toast.info(`${player.name} is now a free agent`);
+                
+                return Object.assign({}, player, {teamId: undefined});
+            });
+            const stage = GAME_STATE_FREE_AGENCY;
+            const gameState = Object.assign({}, state.gameState, {stage});
+            return Object.assign({}, state, {gameState, players});
+        }
+        case AI_SIGN_FREE_AGENTS: {
+            const stage = GAME_STATE_END_OF_SEASON;
+            const gameState = Object.assign({}, state.gameState, {stage});
+            return Object.assign({}, state, {gameState});
+        }
+        case DO_DRAFT: {
+            const {year, teamId} = state.gameState;
+            let draft = state.draft.concat();
+            const players = state.players.concat();
+            const standings = state.standings.concat();
+            standings.sort((a, b) => a.won - b.won);
+            standings.forEach((standing, i) => {
+                const player = draft[i];
+                player.teamId = standing.teamId;
+                player.contractExpiry = year+3;
+                players.push(player);
+                if(player.teamId === teamId) toast.info(`You drafted ${player.name} in the 1st round of the draft`);
+            });
+            draft = draft.slice(standings.length);
+            standings.forEach((standing, i) => {
+                const player = draft[i];
+                player.teamId = standing.teamId;
+                player.contractExpiry = year+3;
+                players.push(player);
+                if(player.teamId === teamId) toast.info(`You drafted ${player.name} in the 2nd round of the draft`);
+            });
+            draft = draftService.createDraftClass(state.nextPlayerId, state.teams.length*2);
+            const nextPlayerId = state.nextPlayerId + draft.length;
+            const stage = GAME_STATE_DRAFT;
+            const gameState = Object.assign({}, state.gameState, {stage});
+            return Object.assign({}, state, {gameState, players, draft, nextPlayerId});
         }
         default: return state;
     }

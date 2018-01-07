@@ -4,7 +4,7 @@ import PageWrapper from '../containers/PageWrapper';
 
 import PlayerTable from '../components/PlayerTable';
 
-export default function FreeAgents(props){
+export default function Draft(props){
     
     const {players} = props;
     

@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
-import FreeAgents from '../pages/FreeAgents';
+import Draft from '../pages/Draft';
 
 const mapStateToProps = (state, ownProps) => {
     
-  const players = state.players.filter(player => !player.teamId);
+  const players = state.draft;
 
   return {
     players
@@ -15,9 +15,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   };
 };
 
-const FreeAgentsContainer = connect(
+const DraftContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(FreeAgents);
+)(Draft);
 
-export default FreeAgentsContainer;
+export default DraftContainer;

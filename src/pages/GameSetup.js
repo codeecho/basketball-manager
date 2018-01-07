@@ -1,5 +1,9 @@
 import React, {Component} from 'react';
 
+import { Button, Table, FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
+
+import PageWrapper from '../containers/PageWrapper';
+
 import Standings from '../containers/Standings';
 
 export default class GameSetup extends Component{
@@ -27,18 +31,29 @@ export default class GameSetup extends Component{
     render(){
         const props = this.props;
         if(!props.teams){
-            return <button onClick={props.loadDemoData}>Load Demo Data</button>
+        return (
+            <PageWrapper>
+                <div className="container" style={{marginTop: 20}}>
+                    <Button block bsSize="large" bsStyle="primary" onClick={props.loadDemoData}>Load Demo Data</Button>
+                </div>
+            </PageWrapper>
+        );
         }else{
             return (
-                <div>
-                    Name: <input type="text" onChange={this.setUsername}/>
-                    <br/>
-                    <table>
-                        <tbody>
-                            {props.teams.map(team => <TeamSelect team={team} setTeam={this.setTeam} />)}
-                        </tbody>
-                    </table>
-                </div>
+                <PageWrapper>
+                    <div className="container" style={{marginTop: 20}}>
+                        <FormGroup>
+                            <ControlLabel>Name: </ControlLabel>
+                            <FormControl type="text" placeholder="Enter your name" onChange={this.setUsername}></FormControl>
+                        </FormGroup>                    
+                        <br/>
+                        <Table>
+                            <tbody>
+                                {props.teams.map(team => <TeamSelect team={team} setTeam={this.setTeam} />)}
+                            </tbody>
+                        </Table>
+                    </div>
+                </PageWrapper>                
             );
         }
     }
@@ -51,7 +66,7 @@ function TeamSelect(props){
         <tr>
             <td>{team.name}</td>
             <td>
-                <button onClick={() => props.setTeam(team)}>Manage</button>
+                <Button bsSize="large" bsStyle="primary" onClick={() => props.setTeam(team)}>Manage</Button>
             </td>
         </tr>
     )

@@ -1,4 +1,4 @@
-import './App.css'
+import './App.less'
 
 import React, {Component} from 'react'
 
@@ -13,6 +13,9 @@ import Team from './containers/Team';
 import Player from './containers/Player';
 import Standings from './containers/Standings';
 import FreeAgents from './containers/FreeAgents';
+import Draft from './containers/Draft';
+
+import { ToastContainer, toast } from 'react-toastify';
 
 class App extends Component {
     
@@ -20,16 +23,20 @@ class App extends Component {
       
     return (
         <Provider store={store}>
-            <Router>
-                <Switch>
-                    <Route path="/" exact={true} render={(props) => <Home {...props} />} />
-                    <Route path="/team/:id" exact={true} render={(props) => <Team {...props} />} />
-                    <Route path="/player/:id" exact={true} render={(props) => <Player {...props} />} />
-                    <Route path="/standings" exact={true} render={(props) => <Standings {...props} />} />
-                    <Route path="/freeAgents" exact={true} render={(props) => <FreeAgents {...props} />} />
-                    <Route component={() => <div>Page not found</div>} />
-                </Switch>
-            </Router>
+            <div>
+                <Router>
+                    <Switch>
+                        <Route path="/" exact={true} render={(props) => <Home {...props} />} />
+                        <Route path="/team/:id" exact={true} render={(props) => <Team {...props} />} />
+                        <Route path="/player/:id" exact={true} render={(props) => <Player {...props} />} />
+                        <Route path="/standings" exact={true} render={(props) => <Standings {...props} />} />
+                        <Route path="/freeAgents" exact={true} render={(props) => <FreeAgents {...props} />} />
+                        <Route path="/draft" exact={true} render={(props) => <Draft {...props} />} />
+                        <Route component={() => <div>Page not found</div>} />
+                    </Switch>
+                </Router>
+                <ToastContainer position={toast.POSITION.BOTTOM_RIGHT} hideProgressBar={true} />
+            </div>
         </Provider>
     );
     

@@ -9,9 +9,14 @@ export const NEW_GAME = 'NEW_GAME';
 
 export const ADVANCE = 'ADVANCE';
 export const PLAY_NEXT_ROUND = 'PLAY_NEXT_ROUND';
+export const DO_DRAFT = 'DO_DRAFT';
+export const HANDLE_EXPIRING_CONTRACTS = 'HANDLE_EXPIRING_CONTRACTS';
+export const CREATE_FREE_AGENTS = 'CREATE_FREE_AGENTS'
+export const AI_SIGN_FREE_AGENTS = 'AI_SIGN_FREE_AGENTS';
 export const END_SEASON = 'END_SEASON';
 
 export const SIGN_FREE_AGENT = 'SIGN_FREE_AGENT';
+export const EXTEND_CONTRACT = 'EXTEND_CONTRACT';
 
 export const ADD_LOG_MESSAGE = 'ADD_LOG_MESSAGE';
 export const REMOVE_LOG_MESSAGE = 'REMOVE_LOG_MESSAGE';
@@ -57,12 +62,27 @@ export function advance(seed){
 export function playNextRound(seed){
     return { type: PLAY_NEXT_ROUND, seed };
 }
+export function doDraft(seed){
+    return { type: DO_DRAFT, seed };
+}
+export function handleExpiringContracts(seed){
+    return { type: HANDLE_EXPIRING_CONTRACTS, seed};
+}
+export function createFreeAgents(seed){
+    return { type: CREATE_FREE_AGENTS, seed}
+}
+export function aiSignFreeAgents(seed){
+    return { type: AI_SIGN_FREE_AGENTS, seed};
+}
 export function endSeason(seed){
     return { type: END_SEASON, seed };
 }
 
 export function signFreeAgent(playerId){
     return { type: SIGN_FREE_AGENT, playerId };
+}
+export function extendContract(playerId){
+    return { type: EXTEND_CONTRACT, playerId };
 }
 
 export function addLogMessage(text){

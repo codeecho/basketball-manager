@@ -12,10 +12,15 @@
     "test:watch": "nwb test-react --server"
   },
   "dependencies": {
+    "bootstrap": "^3.3.7",
+    "bootswatch": "^3.3.7",
+    "nwb-less": "^0.6.1",
     "react": "^16.2.0",
+    "react-bootstrap": "^0.31.5",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
+    "react-toastify": "^3.2.1",
     "redux": "^3.7.2",
     "redux-devtools-extension": "^2.13.2",
     "redux-observable": "^0.17.0",

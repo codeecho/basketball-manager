@@ -20,6 +20,10 @@ export default class Randomizer{
         return text;
     }
     
+    getRandomItem(array){
+        return array[this.getRandomInteger(0, array.length)];
+    }
+    
     getRandomCharFromString(string){
         return string.charAt(this.getRandomInteger(0, string.length - 1));
     }
@@ -29,7 +33,7 @@ export default class Randomizer{
     }
     
     getRandomNumber(min = 0, max = 1){
-        return min + (this.random() * max);
+        return min + (this.random() * (max-min));
     }
     
 }

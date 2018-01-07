@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Navbar, Nav, NavItem, Button, NavDropdown, MenuItem} from 'react-bootstrap';
+
 import {GAME_STATE_REGULAR_SEASON, GAME_STATE_END_OF_SEASON} from '../constants';
 
 export default function PageWrapper(props){
@@ -7,20 +9,48 @@ export default function PageWrapper(props){
     const teamHref = `#/team/${props.teamId}`;
     
     return (
+        
         <div>
-            <div>
-                <a href="#/">Home</a>
-                <a href={teamHref}>My Team</a>
-                <a href="#/freeAgents">Free Agents</a>
-                <span>{props.stage}</span>
-                <UserActions {...props} />
-                {!props.isOnlineGame && <button onClick={props.hostOnlineGame}>Host Online Game</button>}
-                {!props.isOnlineGame && <button onClick={props.joinOnlineGame}>Join Online Game</button>}
-                {props.isOnlineGame && <OnlineGameStatus {...props}/>}
-                <button onClick={props.newGame}>New Game</button>
-                <Log messages={props.logMessages} />
-            </div>
-            <div>
+        
+            <Navbar inverse>
+                <Navbar.Header>
+                  <Navbar.Brand>
+                    <a href="#">Basketball Manager</a>
+                  </Navbar.Brand>
+                  <Navbar.Toggle />
+                </Navbar.Header>
+                {props.teamId && <Navbar.Collapse>
+                  <Nav>
+                    <NavItem href={teamHref}>Team</NavItem>
+                    <NavItem href="#/standings">Standings</NavItem>
+                    <NavItem href="#/freeAgents">Free Agents</NavItem>
+                    <NavItem href="#/draft">Draft</NavItem>
+                    {!props.isOnlineGame && <NavDropdown title="Play Online">
+                      <MenuItem onClick={props.hostOnlineGame}>Host a Game</MenuItem>
+                      <MenuItem onClick={props.joinOnlineGame}>Join a Game</MenuItem>
+                    </NavDropdown>}
+                    <NavItem onClick={props.newGame}>New Game</NavItem>
+                  </Nav>
+                  <Nav pullRight>
+                    {!props.isOnlineGame && <NavItem onClick={props.advance}>Continue</NavItem>}
+                    {props.isOnlineGame && <NavItem onClick={props.playerReady}>Continue</NavItem>}            
+                  </Nav>
+                </Navbar.Collapse>}
+            </Navbar>
+            
+            {props.teamId && <div className="bg-info">
+                <div className="container">
+                    <span>{props.stage} {props.year}</span>
+                </div>
+            </div>}
+            
+            {props.isOnlineGame && <div className="bg-success">
+                <div className="container">
+                    <OnlineGameStatus {...props}/>
+                </div>
+            </div>}
+             
+            <div className="container">
                 {props.children}
             </div>
         </div>
@@ -40,27 +70,4 @@ function OnlineGameStatus(props){
         {waitingForPlayers && <span>Waiting for {playersNotReady} players</span>}
         </div>
     );
-}
-
-function Log(props){
-    const {messages} = props;
-    return (
-        <div>
-            {messages.map(message => <LogMessage {...message} />)}
-        </div>
-    );
-}
-
-function LogMessage(props){
-    const {text} = props;
-    return (
-        <div>{text}</div>
-    );
-}
-
-function UserActions(props){
-    return (<div>
-        {!props.isOnlineGame && <button onClick={props.advance}>Play Next Round</button>}
-        {props.isOnlineGame && <button onClick={props.playerReady}>Play Next Round</button>}
-    </div>)
 }
