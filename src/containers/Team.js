@@ -7,10 +7,12 @@ const mapStateToProps = (state, ownProps) => {
   
   const team = state.teams.find(team => team.id === teamId);
   const players = state.players.filter(player => player.teamId === teamId);
+  const year = state.gameState.year;
 
   return {
     team,
-    players
+    players,
+    year
   };
 };
 

@@ -10,6 +10,7 @@ export const NEW_GAME = 'NEW_GAME';
 export const ADVANCE = 'ADVANCE';
 export const PLAY_NEXT_ROUND = 'PLAY_NEXT_ROUND';
 export const DO_DRAFT = 'DO_DRAFT';
+export const APPLY_TRAINING = 'APPLY_TRAINING';
 export const HANDLE_EXPIRING_CONTRACTS = 'HANDLE_EXPIRING_CONTRACTS';
 export const CREATE_FREE_AGENTS = 'CREATE_FREE_AGENTS'
 export const AI_SIGN_FREE_AGENTS = 'AI_SIGN_FREE_AGENTS';
@@ -64,6 +65,9 @@ export function playNextRound(seed){
 }
 export function doDraft(seed){
     return { type: DO_DRAFT, seed };
+}
+export function applyTraining(seed){
+    return { type: APPLY_TRAINING, seed };
 }
 export function handleExpiringContracts(seed){
     return { type: HANDLE_EXPIRING_CONTRACTS, seed};

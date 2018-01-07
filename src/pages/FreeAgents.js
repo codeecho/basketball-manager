@@ -6,12 +6,12 @@ import PlayerTable from '../components/PlayerTable';
 
 export default function FreeAgents(props){
     
-    const {players} = props;
+    const {players, year} = props;
     
     return (
         <PageWrapper>
             <div>
-                <PlayerTable players={players} />
+                <PlayerTable players={players} year={year} />
             </div>
         </PageWrapper>
     );

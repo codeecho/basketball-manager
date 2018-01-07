@@ -6,10 +6,10 @@ export default class DraftService{
         this.playerBuilder = new PlayerBuilder();
     }
     
-    createDraftClass(nextId, size){
+    createDraftClass(year, nextId, size){
         const draftClass = [];
         for(let i=0; i< size; i++){
-            const player = this.playerBuilder.buildDraftPlayer(nextId++);
+            const player = this.playerBuilder.buildDraftPlayer(year, nextId++);
             draftClass.push(player);
         }
         draftClass.sort((a, b) => b.ability - a.ability);

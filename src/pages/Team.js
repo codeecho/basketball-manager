@@ -6,13 +6,13 @@ import PlayerTable from '../components/PlayerTable';
 
 export default function Team(props){
     
-    const {team, players} = props;
+    const {team, players, year} = props;
     
     return (
         <PageWrapper>
             <div>
                 <h3>{team.name}</h3>
-                <PlayerTable players={players} />
+                <PlayerTable players={players} year={year} />
             </div>
         </PageWrapper>
     );

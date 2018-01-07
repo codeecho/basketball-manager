@@ -4,9 +4,11 @@ import Draft from '../pages/Draft';
 const mapStateToProps = (state, ownProps) => {
     
   const players = state.draft;
+  const year = state.gameState.year;
 
   return {
-    players
+    players,
+    year
   };
 };
 

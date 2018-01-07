@@ -54,7 +54,7 @@ const reducer = (state = initialState, action) => {
         }
         case LOAD_GAME_DATA: {
             const {data} = action;
-            data.draft = draftService.createDraftClass(data.nextPlayerId, data.teams.length*2);
+            data.draft = draftService.createDraftClass(data.options.startYear, data.nextPlayerId, data.teams.length*2);
             data.nextPlayerId = data.nextPlayerId + data.draft.length;
             const newState = Object.assign({}, state, data);
             newState.gameState.year = data.options.startYear;
@@ -198,7 +198,7 @@ const reducer = (state = initialState, action) => {
                 players.push(player);
                 if(player.teamId === teamId) toast.info(`You drafted ${player.name} in the 2nd round of the draft`);
             });
-            draft = draftService.createDraftClass(state.nextPlayerId, state.teams.length*2);
+            draft = draftService.createDraftClass(state.gameState.year, state.nextPlayerId, state.teams.length*2);
             const nextPlayerId = state.nextPlayerId + draft.length;
             const stage = GAME_STATE_DRAFT;
             const gameState = Object.assign({}, state.gameState, {stage});
