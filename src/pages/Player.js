@@ -9,12 +9,13 @@ export default function Player(props){
     
     const {isContractExpiring, player, team, signFreeAgent, extendContract} = props;
     
-    const {name, ability, salary, contractExpiry} = player;    
+    const {name, age, ability, salary, contractExpiry} = player;    
     
     return (
         <PageWrapper>
             <div>
                 <h3>{player.name}</h3>
+                <p>Age: {age}</p>
                 <p>Ability: {ability}</p>
                 {team && <p>Contract: ${salary}M until {contractExpiry}</p>}
                 {!team && <p>Contract: ${salary}M expired</p>}                

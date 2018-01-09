@@ -19,9 +19,6 @@ export const END_SEASON = 'END_SEASON';
 export const SIGN_FREE_AGENT = 'SIGN_FREE_AGENT';
 export const EXTEND_CONTRACT = 'EXTEND_CONTRACT';
 
-export const ADD_LOG_MESSAGE = 'ADD_LOG_MESSAGE';
-export const REMOVE_LOG_MESSAGE = 'REMOVE_LOG_MESSAGE';
-
 export const SAVE_RESULTS = 'SAVE_RESULTS';
 
 export const HOST_ONLINE_GAME = 'HOST_ONLINE_GAME';
@@ -87,13 +84,6 @@ export function signFreeAgent(playerId){
 }
 export function extendContract(playerId){
     return { type: EXTEND_CONTRACT, playerId };
-}
-
-export function addLogMessage(text){
-    return { type: ADD_LOG_MESSAGE, text };
-}
-export function removeLogMessage(message){
-    return { type: REMOVE_LOG_MESSAGE, message };
 }
 
 export function saveResults(results){

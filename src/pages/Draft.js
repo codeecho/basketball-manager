@@ -6,12 +6,12 @@ import PlayerTable from '../components/PlayerTable';
 
 export default function Draft(props){
     
-    const {players, year} = props;
+    const {players} = props;
     
     return (
         <PageWrapper>
             <div>
-                <PlayerTable players={players} year={year} />
+                <PlayerTable players={players} />
             </div>
         </PageWrapper>
     );

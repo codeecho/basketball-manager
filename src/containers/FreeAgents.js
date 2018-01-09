@@ -4,11 +4,9 @@ import FreeAgents from '../pages/FreeAgents';
 const mapStateToProps = (state, ownProps) => {
     
   const players = state.players.filter(player => !player.teamId);
-  const year = state.gameState.year;
 
   return {
-    players,
-    year
+    players
   };
 };
 

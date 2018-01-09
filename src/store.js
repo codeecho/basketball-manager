@@ -5,9 +5,9 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 
 import io from 'socket.io-client';
 
-import config from './config.js';
+import config from './config/config.js';
 
-import reducer from './reducer';
+import rootReducer from './reducers/rootReducer';
 import rootEpic from './epics';
 
 const epicMiddleware = createEpicMiddleware(rootEpic);
@@ -17,7 +17,7 @@ const socket = io(config.server);
 const socketIoMiddleware = createSocketIoMiddleware(socket, "server/");
 
 const store = createStore(
-  reducer,
+  rootReducer,
   composeWithDevTools(
     applyMiddleware(epicMiddleware, socketIoMiddleware)
   )

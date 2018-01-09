@@ -12,7 +12,7 @@ export default class DraftService{
             const player = this.playerBuilder.buildDraftPlayer(year, nextId++);
             draftClass.push(player);
         }
-        draftClass.sort((a, b) => b.ability - a.ability);
+        draftClass.sort((a, b) => b.potential - a.potential);
         return draftClass;
     }
     
