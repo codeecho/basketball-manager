@@ -21,4 +21,8 @@ export default class PersistenceService{
         localStorage.setItem(state.gameState.id, btoa(JSON.stringify(state)));
     }
     
+    newGame(){
+        localStorage.removeItem(CURRENT_GAME_ID);        
+    }
+    
 }

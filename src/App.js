@@ -1,3 +1,4 @@
+import 'typeface-roboto'
 import './App.less'
 
 import React, {Component} from 'react'
@@ -14,8 +15,12 @@ import Player from './containers/Player';
 import Standings from './containers/Standings';
 import FreeAgents from './containers/FreeAgents';
 import Draft from './containers/Draft';
+import TradingBlock from './containers/TradingBlock';
+import TradeNegotiations from './containers/TradeNegotiations';
 
 import { ToastContainer, toast } from 'react-toastify';
+import ModalWrapper from './components/ModalWrapper';
+import ConfirmModal from './components/ConfirmModal';
 
 class App extends Component {
     
@@ -32,10 +37,14 @@ class App extends Component {
                         <Route path="/standings" exact={true} render={(props) => <Standings {...props} />} />
                         <Route path="/freeAgents" exact={true} render={(props) => <FreeAgents {...props} />} />
                         <Route path="/draft" exact={true} render={(props) => <Draft {...props} />} />
+                        <Route path="/tradingBlock" exact={true} render={(props) => <TradingBlock {...props} />} />                        
+                        <Route path="/trade" exact={true} render={(props) => <TradeNegotiations {...props} />} />                         
                         <Route component={() => <div>Page not found</div>} />
                     </Switch>
                 </Router>
                 <ToastContainer position={toast.POSITION.BOTTOM_RIGHT} hideProgressBar={true} />
+                <ModalWrapper />
+                <ConfirmModal />
             </div>
         </Provider>
     );

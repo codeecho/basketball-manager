@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Player from '../pages/Player';
-import { signFreeAgent, extendContract } from '../actions';
+import { signFreeAgent, extendContract, releasePlayer } from '../actions';
 import {GAME_STATE_CONTRACT_NEGOTIATIONS} from '../constants';
 
 const mapStateToProps = (state, ownProps) => {
@@ -28,7 +28,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   const playerId = ownProps.match.params.id * 1;
   return {
       signFreeAgent: () => dispatch(signFreeAgent(playerId)),
-      extendContract: () => dispatch(extendContract(playerId))
+      extendContract: () => dispatch(extendContract(playerId)),
+      releasePlayer: () => dispatch(releasePlayer(playerId))
   };
 };
 

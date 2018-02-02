@@ -2,8 +2,8 @@ import PlayerBuilder from '../services/PlayerBuilder';
 
 export default class DraftService{
     
-    constructor(){
-        this.playerBuilder = new PlayerBuilder();
+    constructor(randomizer){
+        this.playerBuilder = new PlayerBuilder(randomizer);
     }
     
     createDraftClass(year, nextId, size){

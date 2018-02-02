@@ -1,4 +1,5 @@
 import stateModifier from './modifiers/stateModifier';
+import Randomizer from '../utils/Randomizer';
 import DraftService from '../services/DraftService';
 import PlayerService from '../services/PlayerService';
 import {toast} from 'react-toastify';
@@ -33,12 +34,14 @@ export default class SeasonReducer{
                 const realAbility = player.realAbility + realDelta;
                 const ability = Math.floor(realAbility);
                 const delta = ability - originalAbility;
-                return { delta, ability, realAbility };
+                const expectedSalary = this.playerService.calculateExpectedSalary(Object.assign({}, player, {delta, ability, realAbility}));
+                return { delta, ability, realAbility, expectedSalary };
             })
         );
     }
     
     doDraft(action, state){
+        const {seed} = action;
         const {year, teamId} = state.gameState;
         let draft = state.draft.concat();
         const players = state.players.concat();
@@ -59,7 +62,9 @@ export default class SeasonReducer{
             players.push(player);
             if(player.teamId === teamId) toast.info(`You drafted ${player.name} in the 2nd round of the draft`);
         });
-        draft = this.draftService.createDraftClass(state.gameState.year, state.nextPlayerId, state.teams.length*2);
+        const randomizer = new Randomizer(seed);
+        const draftService = new DraftService(randomizer);
+        draft = draftService.createDraftClass(state.gameState.year, state.nextPlayerId, state.teams.length*2);
         const nextPlayerId = state.nextPlayerId + draft.length;
         const stage = GAME_STATE_DRAFT;
         const gameState = Object.assign({}, state.gameState, {stage});
@@ -100,7 +105,7 @@ export default class SeasonReducer{
             state,
             stateModifier.modifyGameState(state, { round, stage, year }),
             stateModifier.modifyStandings(state, () => ({played: 0, won: 0, lost: 0})),
-            stateModifier.modifyPlayers(state, player => ({ age: year - player.dob }))
+            stateModifier.modifyPlayers(state, player => ({ age: year - player.dob -1 }))
         );
     }
     

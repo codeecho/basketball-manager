@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import PageWrapper from '../pages/PageWrapper';
 
-import { advance, endSeason, hostOnlineGame, joinOnlineGame, serverPlayerReady, newGame } from '../actions';
+import { advance, endSeason, hostOnlineGame, joinOnlineGame, serverPlayerReady, newGame, setTradeProposal } from '../actions';
 
 const mapStateToProps = (state, ownProps) => {
 
@@ -28,7 +28,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
           const gameId = prompt('Please enter game id: ');
           dispatch(joinOnlineGame(gameId))
       },
-      newGame: () => dispatch(newGame())
+      newGame: () => dispatch(newGame()),
+      trade: () => dispatch(setTradeProposal(undefined))
   };
 };
 

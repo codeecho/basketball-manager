@@ -1,0 +1,59 @@
+{
+    "options": {
+        "startYear": 2018  
+    },
+    "teams": [
+        {"id": 1, "name": "Golden State Warriors"},
+        {"id": 2, "name": "Cleveland Cavaliers"},
+        {"id": 3, "name": "Minnesota Timberwolves"},
+        {"id": 4, "name": "Boston Celtics"}
+    ],
+    "players": [
+        {"id": 1, "teamId": 1, "name": "Steph Curry", "dob": 1989, "salary": 25, "contractExpiry": 2022, "ability": 84, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 2, "teamId": 1, "name": "Kevin Durant", "dob": 1989, "salary": 15, "contractExpiry": 2018, "ability": 87, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 3, "teamId": 1, "name": "Draymond Green", "dob": 1989, "salary": 19, "contractExpiry": 2021, "ability": 80, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 4, "teamId": 1, "name": "Klay Thompson", "dob": 1989, "salary": 20, "contractExpiry": 2022, "ability": 78, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 5, "teamId": 1, "name": "Jordon Bell", "dob": 1989, "salary": 1.5, "contractExpiry": 2020, "ability": 67, "potential": 85, "prime": 30, "decline": 70},
+        
+        {"id": 6, "teamId": 2, "name": "LeBron James", "dob": 1989, "salary": 25, "contractExpiry": 2018, "ability": 90, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 7, "teamId": 2, "name": "Kevin Love", "dob": 1989, "salary": 15, "contractExpiry": 2019, "ability": 75, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 8, "teamId": 2, "name": "Isiah Thomas", "dob": 1989, "salary": 8, "contractExpiry": 2018, "ability": 80, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 9, "teamId": 2, "name": "JR Smith", "dob": 1989, "salary": 7, "contractExpiry": 2020, "ability": 73, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 10, "teamId": 2, "name": "Jae Crowder", "dob": 1989, "salary": 9, "contractExpiry": 2019, "ability": 73, "potential": 85, "prime": 30, "decline": 70},
+        
+        {"id": 11, "teamId": 3, "name": "Karl Anthony Towns", "dob": 1989, "salary": 10.5, "contractExpiry": 2019, "ability": 77, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 12, "teamId": 3, "name": "Jimmy Butler", "dob": 1989, "salary": 19.5, "contractExpiry": 2020, "ability": 78, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 13, "teamId": 3, "name": "Andrew Wiggins", "dob": 1989, "salary": 23, "contractExpiry": 2022, "ability": 76, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 14, "teamId": 3, "name": "Jeff Teague", "dob": 1989, "salary": 7, "contractExpiry": 2019, "ability": 72, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 15, "teamId": 3, "name": "Taj Gibson", "dob": 1989, "salary": 9, "contractExpiry": 2018, "ability": 73, "potential": 85, "prime": 30, "decline": 70},
+        
+        {"id": 16, "teamId": 4, "name": "Kyrie Irving", "dob": 1989, "salary": 21, "contractExpiry": 2019, "ability": 82, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 17, "teamId": 4, "name": "Gordon Hayward", "dob": 1989, "salary": 18, "contractExpiry": 2019, "ability": 79, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 18, "teamId": 4, "name": "Jason Tatum", "dob": 1989, "salary": 3.6, "contractExpiry": 2020, "ability": 71, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 19, "teamId": 4, "name": "Jaylen Brown", "dob": 1989, "salary": 3.9, "contractExpiry": 2019, "ability": 70, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 20, "teamId": 4, "name": "Al Horford", "dob": 1989, "salary": 17, "contractExpiry": 2021, "ability": 77, "potential": 85, "prime": 30, "decline": 70},
+        
+        {"id": 21, "teamId": null, "name": "Jason King", "dob": 1989, "salary": 2, "contractExpiry": 2017, "ability": 62, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 22, "teamId": null, "name": "John Martin", "dob": 1989, "salary": 2.5, "contractExpiry": 2017, "ability": 60, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 23, "teamId": null, "name": "Michael Porter", "dob": 1989, "salary": 2.1, "contractExpiry": 2017, "ability": 53, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 24, "teamId": null, "name": "Tony Carter", "dob": 1989, "salary": 1.1, "contractExpiry": 2017, "ability": 64, "potential": 85, "prime": 30, "decline": 70},
+        {"id": 25, "teamId": null, "name": "Paul Mendoza", "dob": 1989, "salary": 1.5, "contractExpiry": 2017, "ability": 59, "potential": 85, "prime": 30, "decline": 70}
+    ],
+    "nextPlayerId": 10000,
+    "seed": 1,
+    "standings": [
+        {"teamId": 1, "played": 0, "won": 0, "lost": 0},
+        {"teamId": 2, "played": 0, "won": 0, "lost": 0},
+        {"teamId": 3, "played": 0, "won": 0, "lost": 0},
+        {"teamId": 4, "played": 0, "won": 0, "lost": 0}
+    ],
+    "fixtures": [
+        [{"homeId": 1, "awayId": 2}, {"homeId": 3, "awayId": 4}],
+        [{"homeId": 1, "awayId": 3}, {"homeId": 2, "awayId": 4}],
+        [{"homeId": 1, "awayId": 4}, {"homeId": 2, "awayId": 3}],
+        [{"homeId": 2, "awayId": 1}, {"homeId": 4, "awayId": 3}],
+        [{"homeId": 3, "awayId": 1}, {"homeId": 4, "awayId": 2}],
+        [{"homeId": 4, "awayId": 1}, {"homeId": 3, "awayId": 2}]
+    ]
+
+}

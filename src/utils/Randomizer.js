@@ -21,7 +21,18 @@ export default class Randomizer{
     }
     
     getRandomItem(array){
-        return array[this.getRandomInteger(0, array.length)];
+        return array[this.getRandomInteger(0, array.length-1)];
+    }
+    
+    getRandomItems(array, n){
+        const copy = array.concat();
+        if(n >= array.length) return copy;
+        let result = [];
+        for(let i=0; i<n; i++){
+            const r = this.getRandomInteger(0, copy.length);
+            result = result.concat(copy.splice(r, r+1));
+        }
+        return result;
     }
     
     getRandomCharFromString(string){

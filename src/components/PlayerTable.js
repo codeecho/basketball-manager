@@ -1,41 +1,55 @@
 import React from 'react';
 
-import {Table} from 'react-bootstrap';
+import {Table, Button, Glyphicon} from 'react-bootstrap';
+
+import CheckBox from './CheckBox';
+
+import {GAME_STATE_CONTRACT_NEGOTIATIONS} from '../constants';
 
 export default function PlayerTable(props){
-    const {players} = props;
+    const {players, onSelect, year, stage} = props;
     return (
-        <Table striped hover>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Age</th>
-                    <th>Ability</th>
-                    <th>Potential</th>
-                    <th>Contract</th>                    
-                </tr>
-            </thead>
-            <tbody>
-                { players.map(player => <PlayerRow {...player}/>) }
-            </tbody>
-        </Table>
+        <div className="scrolling-table">
+            <div className="scrolling-table-inner">
+                <Table striped hover>
+                    <thead>
+                        <tr>
+                            {onSelect && <th></th>}
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Ability</th>
+                            <th>Potential</th>
+                            <th>Contract</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { players.map(player => <PlayerRow player={player} {...props} />) }
+                    </tbody>
+                </Table>
+            </div>
+        </div>
     )
 }
 
 function PlayerRow(props){
-    const {id, name, age, ability, delta, potential, salary, contractExpiry, teamId} = props;
+    const {player, onSelect, selectIcon = 'arrow-left', selectButtonStyle = "default", year, stage} = props;
+    const {id, name, age, ability, delta, potential, salary, contractExpiry, teamId, expectedSalary} = player;
+    const isContractExpiring = stage === GAME_STATE_CONTRACT_NEGOTIATIONS && contractExpiry === year;
     const deltaString = delta > 0 ? '+' + delta : ''+delta;
     const playerHref = `#/player/${id}`;
+    const classes = isContractExpiring ? 'info' : '';
     return (
-        <tr>
+        <tr className={classes}>       
+            {onSelect && <td><Button onClick={() => onSelect(player)} bsStyle={selectButtonStyle}><Glyphicon glyph={selectIcon} /></Button></td>}
             <td>
-                <a href={playerHref}>{name}</a>
+                <a href={playerHref} className="nowrap">{name}</a>
             </td>
             <td>{age}</td>
             <td>{ability} ({deltaString})</td>
             <td>{potential}</td>
-            {teamId && <td>${salary}M until {contractExpiry}</td>}
-            {!teamId && <td>${salary}M expired</td>}            
+            {teamId && !isContractExpiring && <td><span className="nowrap">${salary}M until {contractExpiry}</span></td>}
+            {teamId && isContractExpiring && <td><span className="nowrap">expects ${expectedSalary}M for 3 years</span></td>}            
+            {!teamId && <td><span className="nowrap">expects ${expectedSalary}M for 3 years</span></td>}
         </tr>
     )
 }

@@ -1,11 +1,13 @@
 import Randomizer from '../utils/Randomizer';
 import firstNames from '../data/first-names.json';
 import surnames from '../data/surnames.json';
+import PlayerService from './PlayerService';
 
 export default class PlayerBuilder{
     
-    constructor(){
-        this.randomizer = new Randomizer();
+    constructor(randomizer){
+        this.randomizer = randomizer || new Randomizer();
+        this.playerService = new PlayerService();
     }
     
     buildDraftPlayer(year, id){
@@ -13,11 +15,10 @@ export default class PlayerBuilder{
         const potential = this.randomizer.getRandomInteger(ability, 95);
         const age = this.randomizer.getRandomInteger(19, 22);
         const prime = this.randomizer.getRandomInteger(25, 30);
-        let decline = potential - this.randomizer.getRandomInteger(10, 50);
-        if(decline < 20) decline = 20;
+        const decline = 2.5;
         const dob = year - age;
         const name = this.randomizer.getRandomItem(firstNames) + ' ' + this.randomizer.getRandomItem(surnames);
-        return {
+        const player = {
             id,
             teamId: undefined, 
             name, 
@@ -31,6 +32,8 @@ export default class PlayerBuilder{
             potential,
             prime,
             decline
-        }
+        };
+        const expectedSalary = this.playerService.calculateExpectedSalary(player);
+        return Object.assign({}, player, {expectedSalary});
     }
 }

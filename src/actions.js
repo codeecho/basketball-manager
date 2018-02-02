@@ -18,6 +18,9 @@ export const END_SEASON = 'END_SEASON';
 
 export const SIGN_FREE_AGENT = 'SIGN_FREE_AGENT';
 export const EXTEND_CONTRACT = 'EXTEND_CONTRACT';
+export const RELEASE_PLAYER = 'RELEASE_PLAYER';
+export const SET_TRADE_PROPOSAL = 'SET_TRADE_PROPOSAL';
+export const COMPLETE_TRADE = 'COMPLETE_TRADE';
 
 export const SAVE_RESULTS = 'SAVE_RESULTS';
 
@@ -84,6 +87,15 @@ export function signFreeAgent(playerId){
 }
 export function extendContract(playerId){
     return { type: EXTEND_CONTRACT, playerId };
+}
+export function setTradeProposal(proposal){
+    return { type: SET_TRADE_PROPOSAL, proposal };
+}
+export function completeTrade(trade){
+    return { type: COMPLETE_TRADE, trade };
+}
+export function releasePlayer(playerId){
+    return { type: RELEASE_PLAYER, playerId };
 }
 
 export function saveResults(results){

@@ -25,6 +25,8 @@ export default function PageWrapper(props){
                     <NavItem href="#/standings">Standings</NavItem>
                     <NavItem href="#/freeAgents">Free Agents</NavItem>
                     <NavItem href="#/draft">Draft</NavItem>
+                    <NavItem href="#/tradingBlock">Trading Block</NavItem>
+                    <NavItem onClick={props.trade}>Trade</NavItem>                    
                     {!props.isOnlineGame && <NavDropdown title="Play Online">
                       <MenuItem onClick={props.hostOnlineGame}>Host a Game</MenuItem>
                       <MenuItem onClick={props.joinOnlineGame}>Join a Game</MenuItem>
@@ -50,7 +52,7 @@ export default function PageWrapper(props){
                 </div>
             </div>}
              
-            <div className="container">
+            <div className="container main-content">
                 {props.children}
             </div>
         </div>

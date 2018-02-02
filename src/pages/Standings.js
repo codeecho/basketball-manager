@@ -32,9 +32,9 @@ export default function Home(props){
 function Standing(props){
     const { team, played, won, lost, highlight} = props;
     const teamHref = `#/team/${team.id}`;
-    const style = highlight ? {color: 'red'} : undefined;
+    const classes = highlight ? 'success' : undefined;
     return (
-        <tr style={style}>
+        <tr className={classes}>
             <td>
                 <TeamLink team={team} />
             </td>

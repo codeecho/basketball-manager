@@ -1,3 +1,3 @@
 export default {
-    server: 'http://node20.codenvy.io:32851/'
+    server: 'http://node23.codenvy.io:33942/'
 }
