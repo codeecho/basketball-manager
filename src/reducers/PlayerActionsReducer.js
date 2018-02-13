@@ -1,8 +1,16 @@
 import stateModifier from './modifiers/stateModifier';
 import stateSelector from '../utils/stateSelector';
 import {toast} from 'react-toastify';
+import {chain} from '../utils/utils';
+import TeamService from '../services/TeamService';
+import TeamStateModifier from './modifiers/TeamStateModifier';
 
 export default class PlayerActionsReducer{
+    
+    constructor(){
+        this.teamService = new TeamService();
+        this.teamStateModifier = new TeamStateModifier(this.teamService);
+    }
     
     signFreeAgent(action, state){
         const {playerId} = action;
@@ -21,13 +29,9 @@ export default class PlayerActionsReducer{
         
         toast.warning(`${player.name} has been released`);
         
-        return Object.assign(
-            {},
-            state,
-            stateModifier.modifyPlayer(state, playerId, player => {
-                return {teamId: null};
-            })
-        );
+        return stateModifier.modifyPlayers(state, [playerId], player => {
+            return {teamId: null};
+        });
     }
     
     signPlayer(state, playerId){
@@ -46,29 +50,26 @@ export default class PlayerActionsReducer{
         
         const year = state.gameState.year;
         
-        return Object.assign(
-            {}, 
-            state, 
-            stateModifier.modifyPlayer(state, playerId, player => {
+        return chain(
+            stateModifier.modifyPlayers(state, [playerId], player => {
                 return {teamId: team.id, contractExpiry: year+3, salary: player.expectedSalary};
             })
-        );        
+        )
+        .then(state => this.teamStateModifier.modifyPayroll(state, [team.id]))
+        .result;
     }
     
     setTradeProposal(action, state){
         const {proposal} = action;
         window.location = '#/trade';
-        return Object.assign(
-            {}, 
-            state, 
-            stateModifier.modifyGameState(state, {tradeProposal: proposal})
-        );
+        return stateModifier.modifyGameState(state, {tradeProposal: proposal});
     }
     
     completeTrade(action, state){
         const {trade} = action;
         const {requested, team: cpuTeamId, offered} = trade;
         const userTeamId = state.gameState.teamId;
+        
         const players = state.players.map(player => {
             if(requested.players.includes(player)){
                 return Object.assign({}, player, {teamId: userTeamId});
@@ -78,11 +79,17 @@ export default class PlayerActionsReducer{
                 return player;
             }
         });
+        
         const cpuTeam = stateSelector.getTeam(state, cpuTeamId);
+        
         requested.players.forEach(player => toast.success(`You signed ${player.name} from ${cpuTeam.name}`));
         offered.players.forEach(player => toast.warning(`${player.name} signed for ${cpuTeam.name}`));
+        
         window.location = `#/team/${userTeamId}`;
-        return Object.assign({}, state, {players});
+        
+        return chain(Object.assign({}, state, {players}))
+            .then(state => this.teamStateModifier.modifyPayroll(state, [userTeamId, cpuTeamId]))
+            .result;
     }
-    
+
 }

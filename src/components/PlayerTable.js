@@ -16,6 +16,7 @@ export default function PlayerTable(props){
                         <tr>
                             {onSelect && <th></th>}
                             <th>Name</th>
+                            <th>Position</th>                            
                             <th>Age</th>
                             <th>Ability</th>
                             <th>Potential</th>
@@ -33,7 +34,7 @@ export default function PlayerTable(props){
 
 function PlayerRow(props){
     const {player, onSelect, selectIcon = 'arrow-left', selectButtonStyle = "default", year, stage} = props;
-    const {id, name, age, ability, delta, potential, salary, contractExpiry, teamId, expectedSalary} = player;
+    const {id, name, age, ability, delta, potential, salary, contractExpiry, teamId, expectedSalary, position} = player;
     const isContractExpiring = stage === GAME_STATE_CONTRACT_NEGOTIATIONS && contractExpiry === year;
     const deltaString = delta > 0 ? '+' + delta : ''+delta;
     const playerHref = `#/player/${id}`;
@@ -44,6 +45,7 @@ function PlayerRow(props){
             <td>
                 <a href={playerHref} className="nowrap">{name}</a>
             </td>
+            <td>{position}</td>
             <td>{age}</td>
             <td>{ability} ({deltaString})</td>
             <td>{potential}</td>

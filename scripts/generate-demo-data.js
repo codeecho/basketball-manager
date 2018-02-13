@@ -55,6 +55,112 @@ function calculateAbility(ratings) {
     );
 }
 
+function calculatePosition(ratings) {
+    let pg = false;
+    let sg = false;
+    let sf = false;
+    let pf = false;
+    let c = false;
+
+    let position;
+
+    // Without other skills, slot primarily by height
+    if (ratings.hgt >= 59) {
+        // 6'10"
+        position = "C";
+    } else if (ratings.hgt >= 52) {
+        // 6'8"
+        position = "PF";
+    } else if (ratings.hgt >= 44) {
+        // 6'6"
+        position = "SF";
+    } else if (
+        ratings.spd < 70 &&
+        ratings.drb < 70 &&
+        ratings.pss < 70 &&
+        ratings.hgt >= 35
+    ) {
+        position = "SG";
+    } else {
+        position = "PG";
+    }
+
+    // No height requirements for point guards
+    // PG is a fast ball handler, or a super ball handler
+    if (
+        (ratings.spd >= 70 && ratings.pss + ratings.drb >= 100) ||
+        (ratings.spd >= 30 && ratings.pss + ratings.drb >= 145)
+    ) {
+        pg = true;
+    }
+
+    // SG is secondary ball handler and at least one of: slasher or 3p shooter
+    if (
+        ratings.spd >= 50 &&
+        ratings.drb >= 50 &&
+        ratings.hgt >= 37 &&
+        (ratings.dnk >= 65 || ratings.tp >= 75)
+    ) {
+        sg = true;
+    }
+
+    // SF is similar to SG but must be taller and has lower dribble/speed requirements
+    if (
+        ratings.spd >= 35 &&
+        ratings.drb > 25 &&
+        ratings.hgt >= 44 &&
+        (ratings.dnk >= 75 || ratings.tp >= 65)
+    ) {
+        sf = true;
+    }
+
+    // PF must meet height/strength requirements.  If they are too tall then they are a Center only... unless they can shoot
+    if (
+        ratings.hgt >= 44 &&
+        ratings.stre >= 60 &&
+        ratings.hgt + ratings.stre >= 113 &&
+        (ratings.hgt <= 63 || ratings.tp >= 70)
+    ) {
+        pf = true;
+    }
+
+    // C must be extra tall or is strong/shotblocker but not quite as tall
+    if (
+        ratings.hgt >= 63 ||
+        (ratings.hgt >= 54 &&
+            (ratings.hgt + ratings.stre >= 147 || ratings.blk >= 85))
+    ) {
+        c = true;
+    }
+
+    if (pg && !sg && !sf && !pf && !c) {
+        position = "PG";
+    } else if (!pg && sg && !sf && !pf && !c) {
+        position = "SG";
+    } else if (!pg && !sg && sf && !pf && !c) {
+        position = "SF";
+    } else if (!pg && !sg && !sf && pf && !c) {
+        position = "PF";
+    } else if (!pg && !sg && !sf && !pf && c) {
+        position = "C";
+    }
+
+    // Multiple positions
+    if ((pg || sg || sf) && c) {
+        position = "F";
+    } else if ((pg || sg) && (sf || pf)) {
+        position = "GF";
+    } else if (c && pf) {
+        position = "FC";
+    } else if (pf && sf) {
+        position = "F";
+    } else if (pg && sg) {
+        position = "G";
+    }
+
+    return position;
+}
+
 const players = sourceData.players
     .filter(player => [-1].concat(teamIds).includes(player.tid))
     .map((player, i) => {
@@ -69,6 +175,8 @@ const players = sourceData.players
         const prime = 30;
         if(age >= prime) potential = ability;
         const decline = 2.5;
+        const draftYear = 1970;
+        const position = calculatePosition(player.ratings[0]);
         return {
             id,
             teamId,
@@ -78,7 +186,9 @@ const players = sourceData.players
             potential,
             ability,
             prime,
-            decline
+            decline,
+            draftYear,
+            position
         };
     });
     

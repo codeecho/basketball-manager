@@ -6,14 +6,18 @@ import {completeTrade} from '../actions';
 const mapStateToProps = (state, ownProps) => {
     const userPlayers = stateSelector.getUserPlayers(state);
     const players = state.players;
+    const userTeam = stateSelector.getUserTeam(state);
     const teams = stateSelector.getCPUTeams(state);
     const proposal = state.gameState.tradeProposal;
+    const salaryCap = state.options.salaryCap;
     
     return {
         userPlayers,
         players,
+        userTeam,
         teams,
-        proposal
+        proposal,
+        salaryCap
     };
 };
 

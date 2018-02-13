@@ -2,31 +2,28 @@ class StateModifier{
     
     modifyGameState(state, updates){
         const gameState = Object.assign({}, state.gameState, updates);
-        return {gameState};
+        return Object.assign({}, state, {gameState});
     }
     
-    modifyPlayers(state, modifier){
-        return { players: this.modifyArray(state.players, modifier)};
+    modifyPlayers(state, ids, modifier){
+        return Object.assign({}, state, { players: this.modifyArray(state.players, ids, modifier)});
     }
     
-    modifyStandings(state, modifier){
-        return { standings: this.modifyArray(state.standings, modifier)};
+    modifyStandings(state, ids, modifier){
+        return Object.assign({}, state, { standings: this.modifyArray(state.standings, ids, modifier)});
     }
     
-    modifyTeams(state, modifier){
-        return { teams: this.modifyArray(state.teams, modifier)};
+    modifyTeams(state, ids, modifier){
+        return Object.assign({}, state, { teams: this.modifyArray(state.teams, ids, modifier)});
     }
     
-    modifyPlayer(state, playerId, modifier){
-        const players = state.players.map(player => {
-            if(player.id !== playerId) return player;
-            return Object.assign({}, player, modifier);
-        });
-        return { players };
-    }
-    
-    modifyArray(array, modifier){
+    modifyArray(array, ids, modifier){
+        if(!modifier){
+            modifier = ids;
+            ids = undefined;
+        }
         return array.map(item => {
+            if(ids && !ids.includes(item.id)) return item;
             return Object.assign({}, item, modifier(item));
         });
     }

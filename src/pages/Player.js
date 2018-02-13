@@ -52,7 +52,7 @@ export default class Player extends Component{
     
     render(){
     
-        const {isContractExpiring, player, team, signFreeAgent, extendContract} = this.props;
+        const {isContractExpiring, player, team, signFreeAgent, extendContract, isUserPlayer} = this.props;
         
         const {name, age, ability, salary, contractExpiry, expectedSalary} = player;    
         
@@ -66,7 +66,7 @@ export default class Player extends Component{
                     {!team && <p>Contract: expects ${expectedSalary}M over 3 years</p>}                
                     <p>Team: { team ? <TeamLink team={team}/> : 'Free Agent'}</p>
                     {!team && <Button onClick={this.signFreeAgent}>Sign as Free Agent</Button>}
-                    {isContractExpiring && 
+                    {isContractExpiring && isUserPlayer &&
                         <ButtonGroup>
                             <Button bsStyle="danger" onClick={this.releasePlayer}>Release</Button>
                             <Button onClick={this.extendContract}>Extend Contract</Button>

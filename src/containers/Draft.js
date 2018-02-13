@@ -3,7 +3,8 @@ import Draft from '../pages/Draft';
 
 const mapStateToProps = (state, ownProps) => {
     
-  const players = state.draft;
+  const year = state.gameState.year;
+  const players = state.players.filter(player => player.draftYear === year);
 
   return {
     players,

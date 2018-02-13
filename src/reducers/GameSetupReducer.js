@@ -5,6 +5,9 @@ import Randomizer from '../utils/Randomizer';
 import DraftService from '../services/DraftService';
 import PlayerService from '../services/PlayerService';
 import TeamService from '../services/TeamService';
+import TeamStateModifier from './modifiers/TeamStateModifier';
+
+import {chain} from '../utils/utils';
 
 export default class GameSetupReducer{
     
@@ -21,34 +24,27 @@ export default class GameSetupReducer{
         const draftService = new DraftService(randomizer);
         const playerService = new PlayerService();    
         const teamService = new TeamService();
+        const teamStateModifier = new TeamStateModifier(teamService);
         
         const draft = draftService.createDraftClass(year, data.nextPlayerId, data.teams.length*2);
         const nextPlayerId = data.nextPlayerId + draft.length;
         
-        let newState = Object.assign({}, state, data, { draft, nextPlayerId });
+        const players = data.players.concat(draft);
+        
+        let newState = Object.assign({}, state, data, { players, nextPlayerId });
     
         newState.gameState.year = year;
         
-        newState = Object.assign(
-            newState, 
-            stateModifier.modifyPlayers(newState, player => {
-                const age = year - player.dob - 1;
-                const delta = 0;
-                const realAbility = player.ability;
-                const expectedSalary = playerService.calculateExpectedSalary(Object.assign({}, player, {age, delta, realAbility}));
-                const salary = player.salary || expectedSalary;
-                return { age, delta, realAbility, expectedSalary, salary };
-            }),
-        );
-
-        return Object.assign(
-            newState,
-            stateModifier.modifyTeams(newState, team => {
-                const players = stateSelector.getTeamPlayers(newState, team.id);
-                const payroll = teamService.calculatePayroll(players);
-                return { payroll };
-            })
-        );
+        return chain(stateModifier.modifyPlayers(newState, player => {
+            const age = year - player.dob - 1;
+            const delta = 0;
+            const realAbility = player.ability;
+            const expectedSalary = playerService.calculateExpectedSalary(Object.assign({}, player, {age, delta, realAbility}));
+            const salary = player.salary || expectedSalary;
+            return { age, delta, realAbility, expectedSalary, salary };
+        }))
+        .then(state => teamStateModifier.modifyPayroll(state))
+        .result;
     }
     
     setTeam(action, state){

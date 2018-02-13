@@ -16,11 +16,14 @@ const mapStateToProps = (state, ownProps) => {
   const {stage, year} = gameState; 
   
   const isContractExpiring = stage === GAME_STATE_CONTRACT_NEGOTIATIONS && player.contractExpiry === year;
+  
+  const isUserPlayer = player.teamId === gameState.teamId;
 
   return {
     isContractExpiring,
     player,
-    team
+    team,
+    isUserPlayer
   };
 };
 

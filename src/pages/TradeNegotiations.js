@@ -25,17 +25,22 @@ export default class TradingNegotiations extends Component{
         const selectedUserPlayers = proposal ? proposal.requested.players : [];
         const unselectedUserPlayers = proposal ? props.userPlayers.filter(player => !proposal.requested.players.includes(player)) : props.userPlayers;
         
-        const selectedCPUTeamId = proposal ? proposal.team.id : teams[0].id;
+        const selectedCPUTeam = proposal ? proposal.team: teams[0];
+        
         const selectedCPUPlayers = proposal ? proposal.offered.players : [];
-        const unselectedCPUPlayers = players.filter(player => player.teamId === selectedCPUTeamId && (!proposal || !proposal.offered.players.includes(player)));
+        const unselectedCPUPlayers = players.filter(player => player.teamId === selectedCPUTeam.id && (!proposal || !proposal.offered.players.includes(player)));
         
         this.state = {
-            selectedTeamId: selectedCPUTeamId,
+            selectedCPUTeam: selectedCPUTeam,
             unselectedUserPlayers,
             selectedUserPlayers,
             unselectedCPUPlayers,
-            selectedCPUPlayers
+            selectedCPUPlayers,
+            salaryOut: 0,
+            salaryIn: 0
         }
+        
+        this.calculateSalaryTotals();
         
         this.tradeService = new TradeService();
         
@@ -52,11 +57,13 @@ export default class TradingNegotiations extends Component{
     }
     
     selectTeam(teamId){
+        const team = this.props.teams.find(team => team.id === teamId);
         const unselectedCPUPlayers = this.props.players.filter(player => player.teamId === teamId);
         this.setState({
+            selectedCPUTeam: team,
             unselectedCPUPlayers,
             selectedCPUPlayers: []
-        });
+        }, () => this.calculateSalaryTotals());
     }
     
     selectUserPlayer(selectedPlayer){
@@ -65,7 +72,7 @@ export default class TradingNegotiations extends Component{
         this.setState({
             unselectedUserPlayers,
             selectedUserPlayers
-        })
+        }, () => this.calculateSalaryTotals());
     }
     
     deselectUserPlayer(selectedPlayer){
@@ -74,7 +81,7 @@ export default class TradingNegotiations extends Component{
         this.setState({
             unselectedUserPlayers,
             selectedUserPlayers
-        })
+        }, () => this.calculateSalaryTotals());
     }
     
     selectCPUPlayer(selectedPlayer){
@@ -83,7 +90,7 @@ export default class TradingNegotiations extends Component{
         this.setState({
             unselectedCPUPlayers,
             selectedCPUPlayers
-        })
+        }, () => this.calculateSalaryTotals());
     }
     
     deselectCPUPlayer(selectedPlayer){
@@ -92,7 +99,17 @@ export default class TradingNegotiations extends Component{
         this.setState({
             unselectedCPUPlayers,
             selectedCPUPlayers
-        })
+        }, () => this.calculateSalaryTotals());
+    }
+    
+    calculateSalaryTotals(){
+        const {selectedUserPlayers, selectedCPUPlayers} = this.state;
+        const salaryOut = selectedUserPlayers.reduce((total, player) => total + player.salary, 0);
+        const salaryIn = selectedCPUPlayers.reduce((total, player) => total + player.salary, 0);
+        this.setState({
+            salaryOut,
+            salaryIn
+        });
     }
     
     showUserPlayerSelectModal(){
@@ -112,7 +129,7 @@ export default class TradingNegotiations extends Component{
             offered: {
                 players: this.state.selectedUserPlayers
             },
-            team: this.state.selectedTeamId,
+            team: this.state.selectedCPUTeam.id,
             requested: {
                 players: this.state.selectedCPUPlayers
             }
@@ -133,8 +150,14 @@ export default class TradingNegotiations extends Component{
     }
     
     render(){
-        const {userPlayers, teams} = this.props;
+        const {userPlayers, teams, salaryCap, userTeam} = this.props;
+        const {selectedCPUTeam, salaryOut, salaryIn} = this.state;
+        
+        const userPayrollAfterTrade = userTeam.payroll - salaryOut + salaryIn;
+        const cpuPayrollAfterTrade = selectedCPUTeam.payroll + salaryOut - salaryIn
     
+        const tradeAllowed = userPayrollAfterTrade <= salaryCap && cpuPayrollAfterTrade <= salaryCap;    
+        
         return (
             <PageWrapper>
                 <Row>
@@ -147,19 +170,62 @@ export default class TradingNegotiations extends Component{
                         <hr/>
                     </Col>
                     <Col md={6}>
-                        <TeamSelect teams={teams} selectedTeamId={this.state.selectedTeamId} onSelect={this.selectTeam}/>
+                        <TeamSelect teams={teams} selectedTeamId={this.state.selectedCPUTeam.id} onSelect={this.selectTeam}/>
                         <PlayerTable players={this.state.selectedCPUPlayers} onSelect={this.deselectCPUPlayer} selectButtonStyle="danger" selectIcon="minus" />
                         <Button bsSize="large" bsStyle="info" block onClick={this.showCPUPlayerSelectModal}>Add Player</Button>
                     </Col>
                 </Row>
                 <hr/>
                 <Row>
+                    <Col md={6}>
+                        <SalaryTable payroll={userTeam.payroll} salaryOut={salaryOut} salaryIn={salaryIn} payrollAfter={userPayrollAfterTrade} cap={salaryCap} />
+                    </Col>
+                    <Col md={6}>
+                        <SalaryTable payroll={selectedCPUTeam.payroll} salaryOut={salaryIn} salaryIn={salaryOut} payrollAfter={cpuPayrollAfterTrade} cap={salaryCap} />
+                    </Col>
+                </Row>
+                <hr/>
+                <Row>
                     <Col xs={12}>
-                        <Button bsSize="large" bsStyle="primary" block onClick={this.proposeTrade}>Propose Trade</Button>
+                        <Button disabled={!tradeAllowed} bsSize="large" bsStyle="primary" block onClick={this.proposeTrade}>Propose Trade</Button>
                     </Col>
                 </Row>
             </PageWrapper>
         );
     }
     
+}
+
+function SalaryTable(props){
+    const {payroll, salaryIn, salaryOut, payrollAfter, cap} = props;
+    return (
+        <Table>
+            <tbody>
+                <tr>
+                    <th>Current Payroll</th>
+                    <td>${payroll}M</td>
+                </tr>
+                <tr>
+                    <th>Salary Out</th>
+                    <td>${salaryOut}M</td>
+                </tr>
+                <tr>
+                    <th>Salary In</th>
+                    <td>${salaryIn}M</td>
+                </tr>
+                <tr>
+                    <th>Salary Difference</th>
+                    <td>${salaryIn - salaryOut}M</td>
+                </tr>
+                <tr>
+                    <th>Payroll After Trade</th>
+                    <td>${payrollAfter}M</td>
+                </tr>
+                <tr>
+                    <th>Salary Cap</th>
+                    <td>${cap}M</td>
+                </tr>
+            </tbody>
+        </Table>
+    );
 }
