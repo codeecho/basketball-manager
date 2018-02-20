@@ -13,5 +13,11 @@ export const joinOnlineGameEpic = (action$, store) =>
         
         const {user} = state;
         
-        return Observable.of(actions.serverJoinRoom(gameId, user));
+        const teamId = state.gameState.teamId;
+        
+        return Observable.of(actions.serverJoinRoom(gameId, user, teamId));
     });
+
+
+// WEBPACK FOOTER //
+// src/epics/joinOnlineGameEpic.js

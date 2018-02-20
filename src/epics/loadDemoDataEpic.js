@@ -11,3 +11,7 @@ export const loadDemoDataEpic = (action$) =>
     .switchMap(() => {
         return Observable.of(actions.loadGameData(data));
     });
+
+
+// WEBPACK FOOTER //
+// src/epics/loadDemoDataEpic.js

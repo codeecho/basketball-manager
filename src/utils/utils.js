@@ -4,3 +4,7 @@ export function chain(value){
         result: value
     }
 }
+
+
+// WEBPACK FOOTER //
+// src/utils/utils.js

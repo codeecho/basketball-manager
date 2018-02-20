@@ -3,7 +3,11 @@ export const NOOP = 'NOOP';
 export const ERROR = 'ERROR';
 
 export const LOAD_DEMO_DATA = 'LOAD_DEMO_DATA';
+export const LOAD_TEST_DATA = 'LOAD_TEST_DATA';
+export const LOAD_BBL_DATA = 'LOAD_BBL_DATA';
+
 export const LOAD_GAME_DATA = 'LOAD_GAME_DATA';
+
 export const SET_TEAM = 'SET_TEAM';
 export const NEW_GAME = 'NEW_GAME';
 
@@ -27,14 +31,22 @@ export const SAVE_RESULTS = 'SAVE_RESULTS';
 export const HOST_ONLINE_GAME = 'HOST_ONLINE_GAME';
 export const JOIN_ONLINE_GAME = 'JOIN_ONLINE_GAME';
 
+export const SERVER_EVENT = 'SERVER_EVENT';
+
 export const SERVER_JOIN_ROOM = 'server/JOIN_ROOM';
 export const SERVER_PLAYER_READY = 'server/PLAYER_READY';
 export const SERVER_ADVANCE = 'server/ADVANCE';
+export const SERVER_GAME_STATE = 'server/GAME_STATE';
 
 export const CLIENT_USER_CONNECTED = 'client/USER_CONNECTED';
 export const CLIENT_USER_DISCONNECTED = 'client/USER_DISCONNECTED';
 export const CLIENT_PLAYER_READY = 'client/PLAYER_READY';
 export const CLIENT_ADVANCE = 'client/ADVANCE';
+export const CLIENT_GAME_STATE = 'client/GAME_STATE';
+export const CLIENT_SIGN_FREE_AGENT = 'client/SIGN_FREE_AGENT';
+export const CLIENT_EXTEND_CONTRACT = 'client/EXTEND_CONTRACT';
+export const CLIENT_RELEASE_PLAYER = 'client/RELEASE_PLAYER';
+export const CLIENT_COMPLETE_TRADE = 'client/COMPLETE_TRADE';
 
 export function noop(){
     return { type: NOOP };
@@ -44,8 +56,14 @@ export function error(error){
     return { type: ERROR, error };
 }
 
+export function loadTestData(){
+    return { type: LOAD_TEST_DATA };
+}
 export function loadDemoData(){
     return { type: LOAD_DEMO_DATA };
+}
+export function loadBBLData(){
+    return { type: LOAD_BBL_DATA };
 }
 export function loadGameData(data){
     return { type: LOAD_GAME_DATA, data };
@@ -57,11 +75,11 @@ export function newGame(){
     return { type: NEW_GAME };
 }
 
-export function advance(seed){
-    return { type: ADVANCE, seed };
+export function advance(numberOfRounds, seed){
+    return { type: ADVANCE, numberOfRounds, seed };
 }
-export function playNextRound(seed){
-    return { type: PLAY_NEXT_ROUND, seed };
+export function playNextRound(numberOfRounds, seed){
+    return { type: PLAY_NEXT_ROUND, numberOfRounds, seed };
 }
 export function doDraft(seed){
     return { type: DO_DRAFT, seed };
@@ -109,12 +127,23 @@ export function joinOnlineGame(gameId){
     return {type: JOIN_ONLINE_GAME, gameId };
 }
 
-export function serverJoinRoom(room, user){
-    return { type: SERVER_JOIN_ROOM, room, user };
+export function serverEvent(action){
+    return {type: SERVER_EVENT, action};
 }
-export function serverPlayerReady(){
-    return { type: SERVER_PLAYER_READY };
+
+export function serverJoinRoom(room, user, teamId){
+    return { type: SERVER_JOIN_ROOM, room, user, metadata: {teamId} };
 }
-export function serverAdvance(seed){
-    return { type: SERVER_ADVANCE, seed };
+export function serverPlayerReady(numberOfRounds){
+    return { type: SERVER_PLAYER_READY, numberOfRounds };
 }
+export function serverAdvance(numberOfRounds, seed){
+    return { type: SERVER_ADVANCE, numberOfRounds, seed };
+}
+export function serverGameState(users){
+    return { type: SERVER_GAME_STATE, users };
+}
+
+
+// WEBPACK FOOTER //
+// src/actions.js

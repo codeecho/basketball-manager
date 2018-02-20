@@ -11,3 +11,7 @@ class Modal{
 const modal = new Modal();
 
 export default modal;
+
+
+// WEBPACK FOOTER //
+// src/utils/modal.js

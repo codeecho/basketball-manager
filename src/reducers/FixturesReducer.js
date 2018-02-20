@@ -14,31 +14,50 @@ export default class FixturesReducer{
     
     saveResults(action, state){
         const {results} = action;
-        const standings = state.standings.concat();
         
-        results.forEach(result => {
-            const winnerStanding = standings.find(standing => standing.teamId === result.winnerId);
-            winnerStanding.played++;
-            winnerStanding.won++;
-            const loserStanding = standings.find(standing => standing.teamId === result.loserId);
-            loserStanding.played++;
-            loserStanding.lost++;
+        const standings = state.standings.concat();
+        const fixtures = state.fixtures.concat();
+        
+        let roundNo = state.gameState.round;
+        
+        results.forEach((roundResults, i) => {
+            
+            const round = fixtures[roundNo+i];
+            
+            roundResults.forEach(result => {
+                const {fixtureId, winnerId, loserId, homeScore, awayScore} = result;
+            
+                const fixture = round.find(fixture => fixture.id === fixtureId);
+                
+                Object.assign(fixture, {winnerId, loserId, homeScore, awayScore});
+                
+                const winnerStanding = standings.find(standing => standing.teamId === winnerId);
+                winnerStanding.played++;
+                winnerStanding.won++;
+                
+                const loserStanding = standings.find(standing => standing.teamId === loserId);
+                loserStanding.played++;
+                loserStanding.lost++;
+            });
+            
         });
         
         standings.sort((a, b) => b.won - a.won);
         
-        const round = state.gameState.round + 1;
+        roundNo = roundNo + results.length;
         
-        const stage = round < state.fixtures.length ? GAME_STATE_REGULAR_SEASON : GAME_STATE_POST_SEASON;
+        const stage = roundNo < state.fixtures.length ? GAME_STATE_REGULAR_SEASON : GAME_STATE_POST_SEASON;
         
         if(stage === GAME_STATE_POST_SEASON){
             const standing = standings.find(standing => standing.teamId === state.gameState.teamId);
             const position = standings.indexOf(standing) + 1;
-            toast.info(`You finished ${ordinal(position)}`);
+            if(position > 0){
+                toast.info(`You finished ${ordinal(position)}`);
+            }
         }
         
-        const gameState = Object.assign({}, state.gameState, { round, stage });
-        const newState = Object.assign({}, state, { standings, gameState });
+        const gameState = Object.assign({}, state.gameState, { round: roundNo, stage });
+        const newState = Object.assign({}, state, { standings, gameState, fixtures });
         
         this.persistenceService.saveGame(newState);
         
@@ -46,3 +65,7 @@ export default class FixturesReducer{
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/reducers/FixturesReducer.js

@@ -6,6 +6,8 @@ import PageWrapper from '../containers/PageWrapper';
 
 import Standings from '../containers/Standings';
 
+import {NO_TEAM_TEAM_ID} from '../constants';
+
 export default class GameSetup extends Component{
     
     constructor(props){
@@ -25,7 +27,7 @@ export default class GameSetup extends Component{
     }
     
     setTeam(team){
-        this.props.setTeam(team.id, this.state.username);
+        this.props.setTeam(team ? team.id : NO_TEAM_TEAM_ID, this.state.username);
     }
     
     render(){
@@ -34,7 +36,9 @@ export default class GameSetup extends Component{
         return (
             <PageWrapper>
                 <div className="container" style={{marginTop: 20}}>
-                    <Button block bsSize="large" bsStyle="primary" onClick={props.loadDemoData}>Load Demo Data</Button>
+                    <Button block bsSize="large" bsStyle="primary" onClick={props.loadTestData}>Load Test Data</Button>                
+                    <Button block bsSize="large" bsStyle="primary" onClick={props.loadBBLData}>Load BBL Data</Button>
+                    <Button block bsSize="large" bsStyle="primary" onClick={props.loadDemoData}>Load NBA Data</Button>
                 </div>
             </PageWrapper>
         );
@@ -50,6 +54,12 @@ export default class GameSetup extends Component{
                         <Table>
                             <tbody>
                                 {props.teams.map(team => <TeamSelect team={team} setTeam={this.setTeam} />)}
+                                <tr className="button-row">
+                                    <td>NO TEAM</td>
+                                    <td>
+                                        <Button bsStyle="primary" onClick={() => this.setTeam(null)}>Spectate</Button>
+                                    </td>
+                                </tr>
                             </tbody>
                         </Table>
                     </div>
@@ -63,11 +73,15 @@ export default class GameSetup extends Component{
 function TeamSelect(props){
     const {team} = props;
     return (
-        <tr>
+        <tr className="button-row">
             <td>{team.name}</td>
             <td>
-                <Button bsSize="large" bsStyle="primary" onClick={() => props.setTeam(team)}>Manage</Button>
+                <Button bsStyle="primary" onClick={() => props.setTeam(team)}>Manage</Button>
             </td>
         </tr>
     )
 }
+
+
+// WEBPACK FOOTER //
+// src/pages/GameSetup.js

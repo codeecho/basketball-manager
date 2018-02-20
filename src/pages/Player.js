@@ -52,20 +52,19 @@ export default class Player extends Component{
     
     render(){
     
-        const {isContractExpiring, player, team, signFreeAgent, extendContract, isUserPlayer} = this.props;
+        const {isContractExpiring, isFreeAgent, player, team, signFreeAgent, extendContract, isUserPlayer} = this.props;
         
         const {name, age, ability, salary, contractExpiry, expectedSalary} = player;    
         
         return (
-            <PageWrapper>
+            <PageWrapper title={player.name}>
                 <div>
-                    <h3>{player.name}</h3>
                     <p>Age: {age}</p>
                     <p>Ability: {ability}</p>
                     {team && <p>Contract: ${salary}M until {contractExpiry}</p>}
                     {!team && <p>Contract: expects ${expectedSalary}M over 3 years</p>}                
-                    <p>Team: { team ? <TeamLink team={team}/> : 'Free Agent'}</p>
-                    {!team && <Button onClick={this.signFreeAgent}>Sign as Free Agent</Button>}
+                    <p>Team: { team ? <TeamLink team={team}/> : isFreeAgent ? 'Free Agent': 'Undrafted'}</p>
+                    {isFreeAgent && <Button onClick={this.signFreeAgent}>Sign as Free Agent</Button>}
                     {isContractExpiring && isUserPlayer &&
                         <ButtonGroup>
                             <Button bsStyle="danger" onClick={this.releasePlayer}>Release</Button>
@@ -79,3 +78,7 @@ export default class Player extends Component{
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/pages/Player.js

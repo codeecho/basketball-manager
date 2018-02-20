@@ -24,3 +24,7 @@ export default class CheckBox extends Component{
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/components/CheckBox.js

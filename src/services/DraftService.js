@@ -17,3 +17,7 @@ export default class DraftService{
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/services/DraftService.js

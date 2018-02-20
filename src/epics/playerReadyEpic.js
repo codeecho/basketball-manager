@@ -5,15 +5,19 @@ export const playerReadyEpic = (action$, store) =>
   action$
     .filter(action => action.type === actions.CLIENT_PLAYER_READY)
     .debounceTime(0)
-    .switchMap(() => {
+    .switchMap(({numberOfRounds}) => {
         const state = store.getState();
         
-        const {isHost, numberOfPlayers, playersReady} = state.onlineGame;
+        const {isHost, users, playersReady} = state.onlineGame;
         
-        if(isHost && playersReady.length === numberOfPlayers){
+        if(isHost && playersReady.length === users.length){
             const seed = Math.random();
-            return Observable.of(actions.serverAdvance(seed));            
+            return Observable.of(actions.serverAdvance(numberOfRounds, seed));            
         }
         
         return Observable.of(actions.noop());
     });
+
+
+// WEBPACK FOOTER //
+// src/epics/playerReadyEpic.js

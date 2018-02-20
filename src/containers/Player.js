@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import Player from '../pages/Player';
-import { signFreeAgent, extendContract, releasePlayer } from '../actions';
-import {GAME_STATE_CONTRACT_NEGOTIATIONS} from '../constants';
+import { serverEvent, signFreeAgent, extendContract, releasePlayer } from '../actions';
+import {GAME_STATE_CONTRACT_NEGOTIATIONS, FREE_AGENT_TEAM_ID} from '../constants';
 
 const mapStateToProps = (state, ownProps) => {
     
@@ -18,21 +18,24 @@ const mapStateToProps = (state, ownProps) => {
   const isContractExpiring = stage === GAME_STATE_CONTRACT_NEGOTIATIONS && player.contractExpiry === year;
   
   const isUserPlayer = player.teamId === gameState.teamId;
+  
+  const isFreeAgent = player.teamId === FREE_AGENT_TEAM_ID;
 
   return {
     isContractExpiring,
     player,
     team,
-    isUserPlayer
+    isUserPlayer,
+    isFreeAgent
   };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   const playerId = ownProps.match.params.id * 1;
   return {
-      signFreeAgent: () => dispatch(signFreeAgent(playerId)),
-      extendContract: () => dispatch(extendContract(playerId)),
-      releasePlayer: () => dispatch(releasePlayer(playerId))
+      signFreeAgent: () => dispatch(serverEvent(signFreeAgent(playerId))),
+      extendContract: () => dispatch(serverEvent(extendContract(playerId))),
+      releasePlayer: () => dispatch(serverEvent(releasePlayer(playerId)))
   };
 };
 
@@ -42,3 +45,7 @@ const PlayerContainer = connect(
 )(Player);
 
 export default PlayerContainer;
+
+
+// WEBPACK FOOTER //
+// src/containers/Player.js

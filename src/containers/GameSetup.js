@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import GameSetup from '../pages/GameSetup';
-import { loadDemoData, setTeam } from '../actions';
+import { loadTestData, loadDemoData, loadBBLData, setTeam } from '../actions';
 
 const mapStateToProps = (state, ownProps) => {
 
@@ -15,7 +15,9 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
+      loadTestData: () => dispatch(loadTestData()),
       loadDemoData: () => dispatch(loadDemoData()),
+      loadBBLData: () => dispatch(loadBBLData()),
       setTeam: (teamId, username) => dispatch(setTeam(teamId, username))
   };
 };
@@ -26,3 +28,7 @@ const GameSetupContainer = connect(
 )(GameSetup);
 
 export default GameSetupContainer;
+
+
+// WEBPACK FOOTER //
+// src/containers/GameSetup.js

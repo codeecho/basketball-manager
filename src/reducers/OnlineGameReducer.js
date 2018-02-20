@@ -25,4 +25,14 @@ export default class OnlineGameReducer{
         return Object.assign({}, state, {onlineGame});
     }
     
+    clientGameState(action, state){
+        const {users} = action;
+        const onlineGame = Object.assign({}, state.onlineGame, {users});
+        return Object.assign({}, state, {onlineGame});
+    }
+    
 }
+
+
+// WEBPACK FOOTER //
+// src/reducers/OnlineGameReducer.js

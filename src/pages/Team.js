@@ -1,41 +1,30 @@
 import React from 'react';
 
-import {Row, Col, Table} from 'react-bootstrap';
-
 import PageWrapper from '../containers/PageWrapper';
 
-import PlayerTable from '../containers/PlayerTable';
+import TeamFixtures from './tabs/TeamFixtures';
+import Lineup from './tabs/Lineup';
+
+import {FIXTURES_TAB_ID, getTeamTabs} from './tabs/tabs';
 
 export default function Team(props){
     
-    const {team, players, starters, secondUnit, reserves} = props;
+    const {tab, team} = props;
+    
+    const tabs = getTeamTabs(team);
     
     return (
-        <PageWrapper>
-            <div>
-                <h2>{team.name}</h2>
-                <Row>
-                    <Col md={6}>
-                        <Table condensed>
-                            <tbody>
-                                <tr>
-                                    <th>Payroll</th>
-                                    <td>${team.payroll}M</td>
-                                </tr>
-                            </tbody>
-                        </Table>
-                    </Col>
-                </Row>
-                <Row>
-                    <h3>Starters</h3>
-                    <PlayerTable players={starters} />
-                    <h3>Second Unit</h3>
-                    <PlayerTable players={secondUnit} />
-                    <h3>Reserves</h3>
-                    <PlayerTable players={reserves} />
-                </Row>
-            </div>
+        <PageWrapper title={team.name} tabs={tabs} selectedTab={tab}>
+            {tab === FIXTURES_TAB_ID ? 
+                <TeamFixtures {...props} /> 
+            :
+                <Lineup {...props} />
+            }
         </PageWrapper>
     );
     
 }
+
+
+// WEBPACK FOOTER //
+// src/pages/Team.js

@@ -7,32 +7,36 @@ import TeamLink from '../components/TeamLink';
 
 export default function Home(props){
     
-    const {standings, teamId} = props;
+    const {standings, teamId, otherUserTeamIds} = props;
     
     return (
-        <PageWrapper>
-            <Table striped hover>
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>P</th>
-                        <th>W</th>
-                        <th>L</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    { standings.map(standing => <Standing {...standing} highlight={standing.teamId === teamId} key={standing.teamId} />) }
-                </tbody>
-            </Table>
+        <PageWrapper title="Standings">
+            <div>
+                <Table striped hover>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>P</th>
+                            <th>W</th>
+                            <th>L</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { standings.map(standing => <Standing {...standing} teamId={teamId} otherUserTeamIds={otherUserTeamIds} key={standing.teamId} />) }
+                    </tbody>
+                </Table>
+            </div>
         </PageWrapper>
     );
     
 }
 
 function Standing(props){
-    const { team, played, won, lost, highlight} = props;
+    const { team, played, won, lost, teamId, otherUserTeamIds} = props;
     const teamHref = `#/team/${team.id}`;
-    const classes = highlight ? 'success' : undefined;
+    const isUserTeam = team.id === teamId;
+    const isOtherUserTeam = otherUserTeamIds.includes(team.id);
+    const classes = isUserTeam ? 'info' : isOtherUserTeam ? 'warning' : undefined;
     return (
         <tr className={classes}>
             <td>
@@ -44,3 +48,7 @@ function Standing(props){
         </tr>
     )
 }
+
+
+// WEBPACK FOOTER //
+// src/pages/Standings.js

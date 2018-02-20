@@ -14,3 +14,7 @@ export default function PlayerSelect(props){
     return <PlayerTable players={players} onSelect={onSelect} selectButtonStyle="success" selectIcon="plus" />
     
 }
+
+
+// WEBPACK FOOTER //
+// src/components/PlayerSelect.js

@@ -14,3 +14,7 @@ export default function Home(props){
     );
     
 }
+
+
+// WEBPACK FOOTER //
+// src/pages/Home.js

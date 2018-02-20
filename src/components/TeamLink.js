@@ -9,3 +9,7 @@ export default function TeamLink(props){
     return <a href={href}>{name}</a>
     
 }
+
+
+// WEBPACK FOOTER //
+// src/components/TeamLink.js

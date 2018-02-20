@@ -26,3 +26,7 @@ export default class PersistenceService{
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/services/PersistenceService.js

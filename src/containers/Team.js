@@ -8,18 +8,29 @@ const mapStateToProps = (state, ownProps) => {
     
   const teamId = ownProps.match.params.id * 1;
   
+  const tab = ownProps.match.params.tab;
+  
   const team = state.teams.find(team => team.id === teamId);
   
   const players = state.players.filter(player => player.teamId === teamId);
   
   const lineup = teamService.getLineup(players);
   
-  console.log(lineup);
+  const fixtures = state.fixtures.map(round => round.find(fixture => fixture.homeId === teamId || fixture.awayId === teamId));
+  
+  const decoratedFixtures = fixtures.map(fixture => {
+    const {homeId, awayId} = fixture;
+    const homeTeam = state.teams.find(team => team.id === homeId);
+    const awayTeam = state.teams.find(team => team.id === awayId);    
+    return Object.assign({}, fixture, {homeTeam, awayTeam});
+  });
 
   return {
+    tab,
     team,
     players,
-    ...lineup
+    ...lineup,
+    fixtures: decoratedFixtures
   };
 };
 
@@ -34,3 +45,7 @@ const TeamContainer = connect(
 )(Team);
 
 export default TeamContainer;
+
+
+// WEBPACK FOOTER //
+// src/containers/Team.js

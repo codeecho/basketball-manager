@@ -9,7 +9,7 @@ export default function FreeAgents(props){
     const {players} = props;
     
     return (
-        <PageWrapper>
+        <PageWrapper title="Free Agents">
             <div>
                 <PlayerTable players={players} />
             </div>
@@ -17,3 +17,7 @@ export default function FreeAgents(props){
     );
     
 }
+
+
+// WEBPACK FOOTER //
+// src/pages/FreeAgents.js

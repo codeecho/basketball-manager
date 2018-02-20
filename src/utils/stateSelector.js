@@ -32,3 +32,7 @@ class StateSelector{
 const stateSelector = new StateSelector();
 
 export default stateSelector;
+
+
+// WEBPACK FOOTER //
+// src/utils/stateSelector.js

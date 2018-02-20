@@ -41,9 +41,18 @@ export default class TeamService{
         return (startersAvgAbility * 0.7) + (secondUnitAvgAbility * 0.3);
     }
     
+    getSquadRating(players){
+        const lineup = this.getLineup(players);
+        return this.getLineupRating(lineup);
+    }
+    
 }
 
 function getAverageAbility(players){
     if(players.length === 0) return 0;
     return players.reduce((total, player) => total + player.ability, 0) / players.length;
 }
+
+
+// WEBPACK FOOTER //
+// src/services/TeamService.js

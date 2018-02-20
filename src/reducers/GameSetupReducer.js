@@ -6,6 +6,7 @@ import DraftService from '../services/DraftService';
 import PlayerService from '../services/PlayerService';
 import TeamService from '../services/TeamService';
 import TeamStateModifier from './modifiers/TeamStateModifier';
+import FixtureListGenerator from '../services/FixtureListGenerator';
 
 import {chain} from '../utils/utils';
 
@@ -25,13 +26,26 @@ export default class GameSetupReducer{
         const playerService = new PlayerService();    
         const teamService = new TeamService();
         const teamStateModifier = new TeamStateModifier(teamService);
+        const fixtureListGenerator = new FixtureListGenerator();
         
         const draft = draftService.createDraftClass(year, data.nextPlayerId, data.teams.length*2);
         const nextPlayerId = data.nextPlayerId + draft.length;
         
         const players = data.players.concat(draft);
         
-        let newState = Object.assign({}, state, data, { players, nextPlayerId });
+        let fixtures = fixtureListGenerator.generate(data.teams);
+        
+        fixtures = fixtures.map(round => {
+            return round.map((fixture, i) => {
+                return {
+                    id: i,
+                    homeId: fixture.home.id,
+                    awayId: fixture.away.id
+                };
+            });
+        })
+        
+        let newState = Object.assign({}, state, data, { players, nextPlayerId, fixtures });
     
         newState.gameState.year = year;
         
@@ -57,3 +71,7 @@ export default class GameSetupReducer{
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/reducers/GameSetupReducer.js

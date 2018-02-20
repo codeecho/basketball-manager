@@ -17,6 +17,7 @@ import FreeAgents from './containers/FreeAgents';
 import Draft from './containers/Draft';
 import TradingBlock from './containers/TradingBlock';
 import TradeNegotiations from './containers/TradeNegotiations';
+import Settings from './containers/Settings';
 
 import { ToastContainer, toast } from 'react-toastify';
 import ModalWrapper from './components/ModalWrapper';
@@ -32,6 +33,7 @@ class App extends Component {
                 <Router>
                     <Switch>
                         <Route path="/" exact={true} render={(props) => <Home {...props} />} />
+                        <Route path="/team/:id/:tab" exact={true} render={(props) => <Team {...props} />} />
                         <Route path="/team/:id" exact={true} render={(props) => <Team {...props} />} />
                         <Route path="/player/:id" exact={true} render={(props) => <Player {...props} />} />
                         <Route path="/standings" exact={true} render={(props) => <Standings {...props} />} />
@@ -39,6 +41,7 @@ class App extends Component {
                         <Route path="/draft" exact={true} render={(props) => <Draft {...props} />} />
                         <Route path="/tradingBlock" exact={true} render={(props) => <TradingBlock {...props} />} />                        
                         <Route path="/trade" exact={true} render={(props) => <TradeNegotiations {...props} />} />                         
+                        <Route path="/settings" exact={true} render={(props) => <Settings {...props} />} />                                                 
                         <Route component={() => <div>Page not found</div>} />
                     </Switch>
                 </Router>
@@ -54,3 +57,8 @@ class App extends Component {
 }
 
 export default App
+
+
+
+// WEBPACK FOOTER //
+// src/App.js

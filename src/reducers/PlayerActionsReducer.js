@@ -13,30 +13,30 @@ export default class PlayerActionsReducer{
     }
     
     signFreeAgent(action, state){
-        const {playerId} = action;
-        return this.signPlayer(state, playerId);
+        const {playerId, teamId} = action;
+        return this.signPlayer(state, playerId, teamId);
     }
     
     extendContract(action, state){
-        const {playerId} = action;
-        return this.signPlayer(state, playerId);
+        const {playerId, teamId} = action;
+        return this.signPlayer(state, playerId, teamId);
     }
     
     releasePlayer(action, state){
-        const {playerId} = action;
+        const {playerId, teamId} = action;
         
         const player = stateSelector.getPlayer(state, playerId);
         
-        toast.warning(`${player.name} has been released`);
+        if(!teamId || teamId === state.gameState.teamId) toast.warning(`${player.name} has been released`);
         
         return stateModifier.modifyPlayers(state, [playerId], player => {
             return {teamId: null};
         });
     }
     
-    signPlayer(state, playerId){
+    signPlayer(state, playerId, teamId){
         const salaryCap = state.options.salaryCap;
-        const team = stateSelector.getUserTeam(state);
+        const team = teamId ? stateSelector.getTeam(state, teamId) : stateSelector.getUserTeam(state);
         const player = stateSelector.getPlayer(state, playerId);
         
         let newPayroll = team.payroll + player.expectedSalary;
@@ -67,29 +67,34 @@ export default class PlayerActionsReducer{
     
     completeTrade(action, state){
         const {trade} = action;
-        const {requested, team: cpuTeamId, offered} = trade;
-        const userTeamId = state.gameState.teamId;
+
+        const {requested, fromTeamId, toTeamId, offered} = trade;
+        
+        const toTeam = state.teams.find(team => team.id === toTeamId);
         
         const players = state.players.map(player => {
-            if(requested.players.includes(player)){
-                return Object.assign({}, player, {teamId: userTeamId});
-            }else if(offered.players.includes(player)){
-                return Object.assign({}, player, {teamId: cpuTeamId});
+            if(requested.playerIds.includes(player.id)){
+                if(fromTeamId === state.gameState.teamId) toast.success(`You signed ${player.name} from ${toTeam.name}`)
+                return Object.assign({}, player, {teamId: fromTeamId});
+            }else if(offered.playerIds.includes(player.id)){
+                if(fromTeamId === state.gameState.teamId) toast.warning(`${player.name} signed for ${toTeam.name}`)               
+                return Object.assign({}, player, {teamId: toTeamId});
             }else{
                 return player;
             }
         });
         
-        const cpuTeam = stateSelector.getTeam(state, cpuTeamId);
-        
-        requested.players.forEach(player => toast.success(`You signed ${player.name} from ${cpuTeam.name}`));
-        offered.players.forEach(player => toast.warning(`${player.name} signed for ${cpuTeam.name}`));
-        
-        window.location = `#/team/${userTeamId}`;
+        if(fromTeamId === state.gameState.teamId){
+            window.location = `#/team/${fromTeamId}`;
+        }
         
         return chain(Object.assign({}, state, {players}))
-            .then(state => this.teamStateModifier.modifyPayroll(state, [userTeamId, cpuTeamId]))
+            .then(state => this.teamStateModifier.modifyPayroll(state, [fromTeamId, toTeamId]))
             .result;
     }
 
 }
+
+
+// WEBPACK FOOTER //
+// src/reducers/PlayerActionsReducer.js

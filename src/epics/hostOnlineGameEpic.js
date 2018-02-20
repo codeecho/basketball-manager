@@ -15,3 +15,7 @@ export const hostOnlineGameEpic = (action$, store) =>
         
         return Observable.of(actions.joinOnlineGame(gameId));
     });
+
+
+// WEBPACK FOOTER //
+// src/epics/hostOnlineGameEpic.js

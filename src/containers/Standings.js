@@ -10,11 +10,14 @@ const mapStateToProps = (state, ownProps) => {
      return Object.assign({}, standing, {team});
   });
   
+  const otherUserTeamIds = state.onlineGame.users.map(user => user.teamId);
+  
   const {teamId} = gameState;
 
   return {
     standings,
-    teamId
+    teamId,
+    otherUserTeamIds
   };
 };
 
@@ -29,3 +32,7 @@ const StandingsContainer = connect(
 )(Standings);
 
 export default StandingsContainer;
+
+
+// WEBPACK FOOTER //
+// src/containers/Standings.js

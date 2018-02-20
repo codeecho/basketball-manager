@@ -65,3 +65,7 @@ export default class ConfirmModal extends Component{
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/components/ConfirmModal.js

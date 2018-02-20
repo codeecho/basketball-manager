@@ -11,3 +11,7 @@ class Confirm{
 const confirm = new Confirm();
 
 export default confirm;
+
+
+// WEBPACK FOOTER //
+// src/utils/confirm.js

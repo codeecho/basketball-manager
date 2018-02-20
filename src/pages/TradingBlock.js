@@ -10,6 +10,8 @@ import PlayerSelect from '../components/PlayerSelect';
 
 import TradeService from '../services/TradeService';
 
+import {TRADING_BLOCK_TAB_ID, tradeTabs} from './tabs/tabs';
+
 import modal from '../utils/modal';
 
 export default class TradingBlock extends Component{
@@ -68,7 +70,7 @@ export default class TradingBlock extends Component{
         const {userPlayers, teams} = this.props;
     
         return (
-            <PageWrapper>
+            <PageWrapper title="Trading Block" tabs={tradeTabs} selectedTab={TRADING_BLOCK_TAB_ID}>
                 <Row>
                     <Col xs={12}>
                         <PlayerTable players={this.state.selectedPlayers} onSelect={this.deselectPlayer} selectButtonStyle="danger" selectIcon="minus"/>
@@ -107,3 +109,7 @@ function TradeProposal(props){
         </div>
     );
 }
+
+
+// WEBPACK FOOTER //
+// src/pages/TradingBlock.js

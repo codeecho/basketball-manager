@@ -10,6 +10,9 @@ export default class GameStateBuilder{
     
     buildNewGameState(){
         return {
+            options: {
+                
+            },
             gameState: {
                 id: this.randomizer.getRandomString(6).toLowerCase(),
                 stage: GAME_STATE_REGULAR_SEASON,
@@ -24,10 +27,14 @@ export default class GameStateBuilder{
             onlineGame: {
                 id: undefined,
                 isHost: false,
-                numberOfPlayers: 2,
+                users: [],
                 playersReady: []
             }
         };
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/reducers/GameStateBuilder.js

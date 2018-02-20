@@ -48,3 +48,7 @@ export default class Randomizer{
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/utils/Randomizer.js

@@ -23,3 +23,7 @@ class EventHandler{
 const eventHandler = new EventHandler();
 
 export default eventHandler;
+
+
+// WEBPACK FOOTER //
+// src/utils/eventHandler.js

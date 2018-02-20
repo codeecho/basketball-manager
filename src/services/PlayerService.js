@@ -25,6 +25,8 @@ export default class PlayerService{
             }
         }
         
+        if(player.age < 23 && player.teamId < 0) expectedSalary = expectedSalary / 4;
+        
         if(expectedSalary < minSalary) return minSalary;
         if(expectedSalary > maxSalary) return maxSalary;
         
@@ -60,3 +62,7 @@ function calculateTrainingDecline(player, yearsPastPrime){
     const delta = Math.pow(0.15*player.decline*yearsPastPrime, 1.5);
     return delta;
 }
+
+
+// WEBPACK FOOTER //
+// src/services/PlayerService.js

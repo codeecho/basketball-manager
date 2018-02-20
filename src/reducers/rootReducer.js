@@ -1,7 +1,8 @@
 import { LOAD_GAME_DATA, SET_TEAM, SAVE_RESULTS, END_SEASON, ADD_LOG_MESSAGE, REMOVE_LOG_MESSAGE, 
     HOST_ONLINE_GAME, CLIENT_USER_CONNECTED, CLIENT_USER_DISCONNECTED, CLIENT_PLAYER_READY, JOIN_ONLINE_GAME,
     CLIENT_ADVANCE, NEW_GAME, SIGN_FREE_AGENT, HANDLE_EXPIRING_CONTRACTS, CREATE_FREE_AGENTS, AI_SIGN_FREE_AGENTS,
-    EXTEND_CONTRACT, DO_DRAFT, APPLY_TRAINING, SET_TRADE_PROPOSAL, COMPLETE_TRADE, RELEASE_PLAYER} from '../actions';
+    EXTEND_CONTRACT, DO_DRAFT, APPLY_TRAINING, SET_TRADE_PROPOSAL, COMPLETE_TRADE, RELEASE_PLAYER, CLIENT_GAME_STATE,
+    CLIENT_SIGN_FREE_AGENT, CLIENT_EXTEND_CONTRACT, CLIENT_RELEASE_PLAYER, CLIENT_COMPLETE_TRADE} from '../actions';
     
 import { GAME_STATE_REGULAR_SEASON } from '../constants';
 
@@ -56,9 +57,19 @@ const rootReducer = (state = initialState, action) => {
         case JOIN_ONLINE_GAME: return onlineGameReducer.joinOnlineGame(action, state);
         case CLIENT_PLAYER_READY: return onlineGameReducer.clientPlayerReady(action, state);
         case CLIENT_ADVANCE: return onlineGameReducer.clientAdvance(action, state);
+        case CLIENT_GAME_STATE: return onlineGameReducer.clientGameState(action, state);
+        
+        case CLIENT_SIGN_FREE_AGENT: return playerActionsReducer.signFreeAgent(action, state);
+        case CLIENT_EXTEND_CONTRACT: return playerActionsReducer.extendContract(action, state); 
+        case CLIENT_RELEASE_PLAYER: return playerActionsReducer.releasePlayer(action, state);   
+        case CLIENT_COMPLETE_TRADE: return playerActionsReducer.completeTrade(action, state);
         
         default: return state;
     }
 };
 
 export default rootReducer;
+
+
+// WEBPACK FOOTER //
+// src/reducers/rootReducer.js

@@ -27,3 +27,7 @@ const TradingBlockContainer = connect(
 )(TradingBlock);
 
 export default TradingBlockContainer;
+
+
+// WEBPACK FOOTER //
+// src/containers/TradingBlock.js

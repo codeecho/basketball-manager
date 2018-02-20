@@ -24,3 +24,8 @@ const store = createStore(
 );
 
 export default store;
+
+
+
+// WEBPACK FOOTER //
+// src/store.js

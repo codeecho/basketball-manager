@@ -1,3 +1,5 @@
+import './styles/TradeNegotiations.less';
+
 import React, {Component} from 'react';
 
 import {Row, Col, Button, Table} from 'react-bootstrap';
@@ -14,6 +16,8 @@ import modal from '../utils/modal';
 import confirm from '../utils/confirm';
 
 import {toast} from 'react-toastify';
+
+import {TRADE_TAB_ID, tradeTabs} from './tabs/tabs';
 
 export default class TradingNegotiations extends Component{
     
@@ -40,9 +44,7 @@ export default class TradingNegotiations extends Component{
             salaryIn: 0
         }
         
-        this.calculateSalaryTotals();
-        
-        this.tradeService = new TradeService();
+        this.tradeService = new TradeService(teams, players);
         
         this.selectTeam = this.selectTeam.bind(this);
         this.selectUserPlayer = this.selectUserPlayer.bind(this);
@@ -54,6 +56,10 @@ export default class TradingNegotiations extends Component{
         this.showCPUPlayerSelectModal = this.showCPUPlayerSelectModal.bind(this);
         
         this.proposeTrade = this.proposeTrade.bind(this);
+    }
+    
+    componentWillMount(){
+        this.calculateSalaryTotals();
     }
     
     selectTeam(teamId){
@@ -125,17 +131,18 @@ export default class TradingNegotiations extends Component{
     }
     
     proposeTrade(){
-        const trade = {
+        const proposedTrade = {
             offered: {
                 players: this.state.selectedUserPlayers
             },
-            team: this.state.selectedCPUTeam.id,
+            toTeam: this.state.selectedCPUTeam,
+            fromTeam: this.props.userTeam,
             requested: {
                 players: this.state.selectedCPUPlayers
             }
         };
         
-        const result = this.tradeService.assessTrade(trade);
+        const result = this.tradeService.assessTrade(proposedTrade);
         
         if(!result.acceptable){
             toast.warning('Trade Rejected');
@@ -143,6 +150,16 @@ export default class TradingNegotiations extends Component{
             confirm.show({
                 text: 'This trade has been accepted. Confirm you are happy to complete the trade.',
                 onConfirm: () => {
+                    const trade = {
+                        offered: {
+                            playerIds: this.state.selectedUserPlayers.map(player => player.id)
+                        },
+                        toTeamId: this.state.selectedCPUTeam.id,
+                        fromTeamId: this.props.userTeam.id,
+                        requested: {
+                            playerIds: this.state.selectedCPUPlayers.map(player => player.id)
+                        }
+                    };
                     this.props.completeTrade(trade);
                 }
             });
@@ -159,7 +176,7 @@ export default class TradingNegotiations extends Component{
         const tradeAllowed = userPayrollAfterTrade <= salaryCap && cpuPayrollAfterTrade <= salaryCap;    
         
         return (
-            <PageWrapper>
+            <PageWrapper id="trade-page" title="Trading Block" tabs={tradeTabs} selectedTab={TRADE_TAB_ID}>
                 <Row>
                     <Col md={6}>
                         <h5>&nbsp;</h5>
@@ -198,6 +215,7 @@ export default class TradingNegotiations extends Component{
 
 function SalaryTable(props){
     const {payroll, salaryIn, salaryOut, payrollAfter, cap} = props;
+    const className = payrollAfter > cap ? 'danger' : 'success';
     return (
         <Table>
             <tbody>
@@ -217,7 +235,7 @@ function SalaryTable(props){
                     <th>Salary Difference</th>
                     <td>${salaryIn - salaryOut}M</td>
                 </tr>
-                <tr>
+                <tr className={className}>
                     <th>Payroll After Trade</th>
                     <td>${payrollAfter}M</td>
                 </tr>
@@ -229,3 +247,7 @@ function SalaryTable(props){
         </Table>
     );
 }
+
+
+// WEBPACK FOOTER //
+// src/pages/TradeNegotiations.js

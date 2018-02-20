@@ -22,3 +22,7 @@ const PlayerTableContainer = connect(
 )(PlayerTable);
 
 export default PlayerTableContainer;
+
+
+// WEBPACK FOOTER //
+// src/containers/PlayerTable.js

@@ -16,3 +16,7 @@ export default class TeamStateModifier{
     }
     
 }
+
+
+// WEBPACK FOOTER //
+// src/reducers/modifiers/TeamStateModifier.js

@@ -1,46 +1,55 @@
 import React from 'react';
 
-import { Navbar, Nav, NavItem, Button, NavDropdown, MenuItem} from 'react-bootstrap';
+import { Navbar, Nav, NavItem, NavDropdown, Button, MenuItem, Glyphicon} from 'react-bootstrap';
 
 import {GAME_STATE_REGULAR_SEASON, GAME_STATE_END_OF_SEASON} from '../constants';
 
 export default function PageWrapper(props){
     
-    const teamHref = `#/team/${props.teamId}`;
+    const {id, title, teamId, tabs = [], selectedTab, stage, year, draftType, isOnlineGame, isHost, canAdvance} = props;
+    
+    const teamHref = `#/team/${teamId}`;
     
     return (
         
-        <div>
+        <div id={id}>
         
-            <Navbar inverse>
-                <Navbar.Header>
+            <Navbar fluid className='header'>
                   <Navbar.Brand>
-                    <a href="#">Basketball Manager</a>
+                    <Glyphicon glyph="chevron-left" className="history-button" onClick={() => window.history.back()} />
+                    <Glyphicon glyph="chevron-right" className="history-button" onClick={() => window.history.forward()} />
+                    <span className="title">{title || 'Basketball Manager'}</span>
+                    <span className="subtitle">{stage + ' ' + year}</span>
                   </Navbar.Brand>
-                  <Navbar.Toggle />
-                </Navbar.Header>
-                {props.teamId && <Navbar.Collapse>
-                  <Nav>
-                    <NavItem href={teamHref}>Team</NavItem>
-                    <NavItem href="#/standings">Standings</NavItem>
-                    <NavItem href="#/freeAgents">Free Agents</NavItem>
-                    <NavItem href="#/draft">Draft</NavItem>
-                    <NavItem href="#/tradingBlock">Trading Block</NavItem>
-                    <NavItem onClick={props.trade}>Trade</NavItem>                    
-                    {!props.isOnlineGame && <NavDropdown title="Play Online">
-                      <MenuItem onClick={props.hostOnlineGame}>Host a Game</MenuItem>
-                      <MenuItem onClick={props.joinOnlineGame}>Join a Game</MenuItem>
+                {props.teamId &&
+                    <Nav pullRight>
+                      {(stage === GAME_STATE_REGULAR_SEASON && (!isOnlineGame || isHost)) && <NavDropdown eventKey={1} title="Continue" disabled={!canAdvance}>
+                        <MenuItem eventKey={1.1} onClick={() => props.advance(isOnlineGame, 1)}>Play Next Round</MenuItem>
+                        <MenuItem eventKey={1.2} onClick={() => props.advance(isOnlineGame, 5)}>Play Next 5 Rounds</MenuItem>
+                        <MenuItem eventKey={1.3} onClick={() => props.advance(isOnlineGame, 10)}>Play Next 10 Rounds</MenuItem>
+                        <MenuItem eventKey={1.3} onClick={() => props.advance(isOnlineGame, 99)}>Play Full Season</MenuItem>                        
                     </NavDropdown>}
-                    <NavItem onClick={props.newGame}>New Game</NavItem>
-                  </Nav>
-                  <Nav pullRight>
-                    {!props.isOnlineGame && <NavItem onClick={props.advance}>Continue</NavItem>}
-                    {props.isOnlineGame && <NavItem onClick={props.playerReady}>Continue</NavItem>}            
-                  </Nav>
-                </Navbar.Collapse>}
+                    {(stage !== GAME_STATE_REGULAR_SEASON || (isOnlineGame && !isHost)) && <NavItem onClick={() => props.advance(isOnlineGame, 1)} disabled={!canAdvance}>Continue</NavItem>                  }
+                                        </Nav>}
+                 <div className="pull-left tabs">
+                    {tabs.map(tab => <a href={tab.target} className={tab.id === selectedTab ? 'active' : ''}>{tab.label}</a>)}                   
+                </div>
             </Navbar>
             
-            {props.teamId && <div className="bg-info">
+            <Navbar className='sidebar' fluid>
+                {props.teamId &&
+                  <Nav>
+                    <NavItem href="#/standings" title="Home"><Glyphicon glyph="home"/></NavItem>                  
+                    <NavItem href={teamHref} title="Team"><Glyphicon glyph="user"/></NavItem>
+                    <NavItem href="#/standings" title="Standings"><Glyphicon glyph="list"/></NavItem>
+                    <NavItem href="#/freeAgents" title="Free Agents"><Glyphicon glyph="pencil"/></NavItem>
+                    <NavItem onClick={props.trade} title="Trade"><Glyphicon glyph="transfer"/></NavItem>                    
+                    {!draftType && <NavItem href="#/draft" title="Draft"><Glyphicon glyph="list-alt"/></NavItem>}
+                    <NavItem href="#/settings" title="Settings"><Glyphicon glyph="cog"/></NavItem>                    
+                  </Nav>}
+            </Navbar>
+            
+            {props.teamId && false && <div className="bg-info">
                 <div className="container">
                     <span>{props.stage} {props.year}</span>
                 </div>
@@ -52,7 +61,7 @@ export default function PageWrapper(props){
                 </div>
             </div>}
              
-            <div className="container main-content">
+            <div className="container-fluid main-content">
                 {props.children}
             </div>
         </div>
@@ -61,15 +70,17 @@ export default function PageWrapper(props){
 }
 
 function OnlineGameStatus(props){
-    const {onlineGame} = props;
-    const {numberOfPlayers, playersReady} = onlineGame;
-    const playersNotReady = numberOfPlayers - playersReady.length;
-    const waitingForPlayers = playersNotReady > 0;
-    const canAdvance = !waitingForPlayers && onlineGame.isHost;
+    const {playersNotReady, waitingForPlayers, numberOfPlayers, playersReady} = props;
     return (
-        <div>
+        <div style={{color: 'white'}}>
         <span> Game Id: {props.onlineGame.id} </span>
-        {waitingForPlayers && <span>Waiting for {playersNotReady} players</span>}
+        <span>{numberOfPlayers} connected </span>
+        <span>{playersReady} ready</span>
         </div>
     );
 }
+
+
+
+// WEBPACK FOOTER //
+// src/pages/PageWrapper.js

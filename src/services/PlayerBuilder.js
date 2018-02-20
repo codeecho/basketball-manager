@@ -3,6 +3,8 @@ import firstNames from '../data/first-names.json';
 import surnames from '../data/surnames.json';
 import PlayerService from './PlayerService';
 
+import {UNDRAFTED_TEAM_ID} from '../constants';
+
 const positions = ['PG', 'SG', 'SF', 'PF', 'C', 'G', 'F', 'GF', 'FC']
 
 export default class PlayerBuilder{
@@ -13,17 +15,17 @@ export default class PlayerBuilder{
     }
     
     buildDraftPlayer(year, id){
-        const ability = this.randomizer.getRandomInteger(20, 60);
-        const potential = this.randomizer.getRandomInteger(ability, 95);
-        const age = this.randomizer.getRandomInteger(19, 22);
-        const prime = this.randomizer.getRandomInteger(25, 30);
-        const decline = 2.5;
-        const dob = year - age;
         const name = this.randomizer.getRandomItem(firstNames) + ' ' + this.randomizer.getRandomItem(surnames);
+        const ability = this.randomizer.getRandomInteger(25, 55);
+        const potential = this.randomizer.getRandomInteger(ability+5, ability+40);
+        const age = this.randomizer.getRandomInteger(19, 22);
+        const prime = this.randomizer.getRandomInteger(28, 31);
+        const decline = 2.5;
+        const dob = year - age - 1;
         const position = this.randomizer.getRandomItem(positions);
         const player = {
             id,
-            teamId: undefined, 
+            teamId: UNDRAFTED_TEAM_ID, 
             name, 
             dob,
             age,
@@ -42,3 +44,7 @@ export default class PlayerBuilder{
         return Object.assign({}, player, {expectedSalary});
     }
 }
+
+
+// WEBPACK FOOTER //
+// src/services/PlayerBuilder.js

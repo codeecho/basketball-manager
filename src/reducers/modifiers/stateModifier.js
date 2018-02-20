@@ -24,7 +24,8 @@ class StateModifier{
         }
         return array.map(item => {
             if(ids && !ids.includes(item.id)) return item;
-            return Object.assign({}, item, modifier(item));
+            const changes = modifier(item) || {};
+            return Object.assign({}, item, changes);
         });
     }
     
@@ -33,3 +34,7 @@ class StateModifier{
 const stateModifier = new StateModifier();
 
 export default stateModifier;
+
+
+// WEBPACK FOOTER //
+// src/reducers/modifiers/stateModifier.js

@@ -1,12 +1,14 @@
 import { connect } from 'react-redux';
 import Draft from '../pages/Draft';
+import {UNDRAFTED_TEAM_ID} from '../constants';
 
 const mapStateToProps = (state, ownProps) => {
     
   const year = state.gameState.year;
-  const players = state.players.filter(player => player.draftYear === year);
+  const players = state.players.filter(player => player.teamId === UNDRAFTED_TEAM_ID);
 
   return {
+    year,
     players,
   };
 };
@@ -22,3 +24,7 @@ const DraftContainer = connect(
 )(Draft);
 
 export default DraftContainer;
+
+
+// WEBPACK FOOTER //
+// src/containers/Draft.js

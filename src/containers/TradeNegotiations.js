@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import TradeNegotiations from '../pages/TradeNegotiations';
 import stateSelector from '../utils/stateSelector';
-import {completeTrade} from '../actions';
+import {serverEvent, completeTrade} from '../actions';
 
 const mapStateToProps = (state, ownProps) => {
     const userPlayers = stateSelector.getUserPlayers(state);
@@ -23,7 +23,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-      completeTrade: (trade) => dispatch(completeTrade(trade))
+      completeTrade: (trade) => dispatch(serverEvent(completeTrade(trade)))
   };
 };
 
@@ -33,3 +33,7 @@ const TradeNegotiationsContainer = connect(
 )(TradeNegotiations);
 
 export default TradeNegotiationsContainer;
+
+
+// WEBPACK FOOTER //
+// src/containers/TradeNegotiations.js

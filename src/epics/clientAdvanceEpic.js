@@ -5,6 +5,10 @@ export const clientAdvanceEpic = (action$) =>
   action$
     .filter(action => action.type === actions.CLIENT_ADVANCE)
     .debounceTime(0)
-    .switchMap(({seed}) => {
-        return Observable.of(actions.advance(seed));
+    .switchMap(({numberOfRounds, seed}) => {
+        return Observable.of(actions.advance(numberOfRounds, seed));
     });
+
+
+// WEBPACK FOOTER //
+// src/epics/clientAdvanceEpic.js

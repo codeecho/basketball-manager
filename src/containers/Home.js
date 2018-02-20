@@ -21,3 +21,7 @@ const HomeContainer = connect(
 )(Home);
 
 export default HomeContainer;
+
+
+// WEBPACK FOOTER //
+// src/containers/Home.js
