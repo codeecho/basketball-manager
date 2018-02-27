@@ -36,7 +36,7 @@ export default class GameSetup extends Component{
         return (
             <PageWrapper>
                 <div className="container" style={{marginTop: 20}}>
-                    <Button block bsSize="large" bsStyle="primary" href="/#/load">Load Saved Game</Button>                                
+                    <Button block bsSize="large" bsStyle="primary" href="#/load">Load Saved Game</Button>                                
                     <hr/>
                     <Button block bsSize="large" bsStyle="primary" onClick={props.loadTestData}>New Test Game</Button>                
                     <Button block bsSize="large" bsStyle="primary" onClick={props.loadBBLData}>New BBL Game</Button>
