@@ -28,10 +28,16 @@ export default class GameSetupReducer{
         const teamStateModifier = new TeamStateModifier(teamService);
         const fixtureListGenerator = new FixtureListGenerator();
         
-        const draft = draftService.createDraftClass(year, data.nextPlayerId, data.teams.length*2);
-        const nextPlayerId = data.nextPlayerId + draft.length;
+        let players = data.players;
+        let nextPlayerId = data.nextPlayerId;
         
-        const players = data.players.concat(draft);
+        const hasDraft = data.players.filter(player => player.teamId === -2 && player.draftYear === year).length > 0
+        
+        if(!hasDraft){
+            const draft = draftService.createDraftClass(year, data.nextPlayerId, data.teams.length*2);
+            nextPlayerId = nextPlayerId + draft.length;
+            players = players.concat(draft);
+        }
         
         let fixtures = fixtureListGenerator.generate(data.teams);
         

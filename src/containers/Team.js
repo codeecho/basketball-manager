@@ -12,9 +12,15 @@ const mapStateToProps = (state, ownProps) => {
   
   const team = state.teams.find(team => team.id === teamId);
   
-  const players = state.players.filter(player => player.teamId === teamId);
+  const players = state.players.filter(player => player.teamId === teamId)
+    .map(player => {
+        const ratings = state.playerRatings.find(ratings => ratings.playerId === player.id) || {games: 0, ppg: 0, apg: 0, rpg: 0};
+        return Object.assign({}, player, {ratings});
+    });
   
   const lineup = teamService.getLineup(players);
+  
+  const lineupRatings = teamService.getLineupRatings(lineup);
   
   const fixtures = state.fixtures.map(round => round.find(fixture => fixture.homeId === teamId || fixture.awayId === teamId));
   
@@ -30,7 +36,8 @@ const mapStateToProps = (state, ownProps) => {
     team,
     players,
     ...lineup,
-    fixtures: decoratedFixtures
+    fixtures: decoratedFixtures,
+    lineupRatings
   };
 };
 

@@ -15,6 +15,7 @@ export default class Player extends Component{
         return (
             <PageWrapper title="Settings">
                 <div>
+                    <Button bsSize="large" bsStyle="primary" block href="/#/load">Load Saved Game</Button>                              
                     <Button bsSize="large" bsStyle="primary" block onClick={this.props.newGame}>Start New Game</Button>              
                     <Button bsSize="large" bsStyle="primary" block onClick={this.props.hostOnlineGame}>Host Online Game</Button>
                     <Button bsSize="large" bsStyle="primary" block onClick={this.props.joinOnlineGame}>Join Online Game</Button>                    

@@ -36,9 +36,42 @@ export default class TeamService{
     }
     
     getLineupRating(lineup){
-        const startersAvgAbility = getAverageAbility(lineup.starters);
-        const secondUnitAvgAbility = getAverageAbility(lineup.secondUnit);
-        return (startersAvgAbility * 0.7) + (secondUnitAvgAbility * 0.3);
+        return this.getLineupRatings(lineup).overall;
+    }
+    
+    getLineupRatings(lineup){
+        const startersRatings = this.getUnitRatings(lineup.starters);
+        const secondUnitRatings = this.getUnitRatings(lineup.secondUnit);
+        const startersRatio = 0.75;
+        const secondUnitRatio = 0.25
+        return {
+            scoring: (startersRatings.scoring * startersRatio) + (secondUnitRatings.scoring * secondUnitRatio),
+            defense: (startersRatings.defense * startersRatio) + (secondUnitRatings.defense * secondUnitRatio),
+            rebounding: (startersRatings.rebounding * startersRatio) + (secondUnitRatings.rebounding * secondUnitRatio),
+            passing: (startersRatings.passing * startersRatio) + (secondUnitRatings.passing * secondUnitRatio),           
+            offensiveRating: (startersRatings.offensiveRating * startersRatio) + (secondUnitRatings.offensiveRating * secondUnitRatio),
+            defensiveRating: (startersRatings.defensiveRating * startersRatio) + (secondUnitRatings.defensiveRating * secondUnitRatio),           
+            overall: (startersRatings.overall * startersRatio) + (secondUnitRatings.overall * secondUnitRatio)
+        };
+    }
+    
+    getUnitRatings(players){
+        const scoring = getAverageAttributeRating(players, 'scoring', [4, 2, 2, 1, 1]);
+        const defense = getAverageAttributeRating(players, 'defense', [2, 1, 1, 1, 1]);
+        const rebounding = getAverageAttributeRating(players, 'rebounding', [2, 2, 1, 1, 1]);
+        const passing = getAverageAttributeRating(players, 'passing', [4, 2, 1, 1, 1]);
+        const offensiveRating = scoring * 0.85 + passing * 0.14 + rebounding * 0.01;
+        const defensiveRating = defense * 0.8 + rebounding * 0.2;
+        const overall = offensiveRating * 0.7 + defensiveRating * 0.3;
+        return {
+            scoring,
+            defense,
+            rebounding,
+            passing,
+            offensiveRating,
+            defensiveRating,
+            overall
+        };
     }
     
     getSquadRating(players){
@@ -46,11 +79,19 @@ export default class TeamService{
         return this.getLineupRating(lineup);
     }
     
+    getSquadRatings(players){
+        const lineup = this.getLineup(players);
+        return this.getLineupRatings(lineup);
+    }    
+    
 }
 
-function getAverageAbility(players){
+function getAverageAttributeRating(players, attribute, weights){
     if(players.length === 0) return 0;
-    return players.reduce((total, player) => total + player.ability, 0) / players.length;
+    players = players.concat();
+    players.sort((a, b) => b[attribute] - a[attribute]);
+    const weightTotal = weights.reduce((total, weight) => total + weight, 0);
+    return players.reduce((total, player, i) => total + (player[attribute]*weights[i]), 0) / weightTotal;
 }
 
 

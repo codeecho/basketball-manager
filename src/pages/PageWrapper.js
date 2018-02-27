@@ -19,7 +19,7 @@ export default function PageWrapper(props){
                     <Glyphicon glyph="chevron-left" className="history-button" onClick={() => window.history.back()} />
                     <Glyphicon glyph="chevron-right" className="history-button" onClick={() => window.history.forward()} />
                     <span className="title">{title || 'Basketball Manager'}</span>
-                    <span className="subtitle">{stage + ' ' + year}</span>
+                    {props.teamId && <span className="subtitle">{stage + ' ' + year}</span>}
                   </Navbar.Brand>
                 {props.teamId &&
                     <Nav pullRight>
@@ -40,20 +40,14 @@ export default function PageWrapper(props){
                 {props.teamId &&
                   <Nav>
                     <NavItem href="#/standings" title="Home"><Glyphicon glyph="home"/></NavItem>                  
-                    <NavItem href={teamHref} title="Team"><Glyphicon glyph="user"/></NavItem>
+                    {teamId > 0 && <NavItem href={teamHref} title="Team"><Glyphicon glyph="user"/></NavItem>}
                     <NavItem href="#/standings" title="Standings"><Glyphicon glyph="list"/></NavItem>
                     <NavItem href="#/freeAgents" title="Free Agents"><Glyphicon glyph="pencil"/></NavItem>
-                    <NavItem onClick={props.trade} title="Trade"><Glyphicon glyph="transfer"/></NavItem>                    
+                    {teamId > 0 && <NavItem onClick={props.trade} title="Trade"><Glyphicon glyph="transfer"/></NavItem>}                  
                     {!draftType && <NavItem href="#/draft" title="Draft"><Glyphicon glyph="list-alt"/></NavItem>}
                     <NavItem href="#/settings" title="Settings"><Glyphicon glyph="cog"/></NavItem>                    
                   </Nav>}
             </Navbar>
-            
-            {props.teamId && false && <div className="bg-info">
-                <div className="container">
-                    <span>{props.stage} {props.year}</span>
-                </div>
-            </div>}
             
             {props.isOnlineGame && <div className="bg-success">
                 <div className="container">

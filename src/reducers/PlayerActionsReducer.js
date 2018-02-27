@@ -29,9 +29,13 @@ export default class PlayerActionsReducer{
         
         if(!teamId || teamId === state.gameState.teamId) toast.warning(`${player.name} has been released`);
         
-        return stateModifier.modifyPlayers(state, [playerId], player => {
-            return {teamId: null};
-        });
+        return chain(
+            stateModifier.modifyPlayers(state, [playerId], player => {
+                return {teamId: null};
+            })
+        )
+        .then(state => this.teamStateModifier.modifyPayroll(state, [teamId || state.gameState.teamId]))
+        .result;
     }
     
     signPlayer(state, playerId, teamId){

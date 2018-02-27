@@ -115,7 +115,7 @@ export default class TradingNegotiations extends Component{
         this.setState({
             salaryOut,
             salaryIn
-        });
+        }, () => this.assessTrade());
     }
     
     showUserPlayerSelectModal(){
@@ -128,6 +128,23 @@ export default class TradingNegotiations extends Component{
         modal.show({
             body: <PlayerSelect players={this.state.unselectedCPUPlayers} selectPlayer={this.selectCPUPlayer} />
         });
+    }
+    
+    assessTrade(){
+        const proposedTrade = {
+            offered: {
+                players: this.state.selectedUserPlayers
+            },
+            toTeam: this.state.selectedCPUTeam,
+            fromTeam: this.props.userTeam,
+            requested: {
+                players: this.state.selectedCPUPlayers
+            }
+        };
+        
+        const result = this.tradeService.assessTrade(proposedTrade);
+        
+        this.setState(result);
     }
     
     proposeTrade(){
@@ -168,7 +185,7 @@ export default class TradingNegotiations extends Component{
     
     render(){
         const {userPlayers, teams, salaryCap, userTeam} = this.props;
-        const {selectedCPUTeam, salaryOut, salaryIn} = this.state;
+        const {selectedCPUTeam, salaryOut, salaryIn, fromTeamRatings, toTeamRatings} = this.state;
         
         const userPayrollAfterTrade = userTeam.payroll - salaryOut + salaryIn;
         const cpuPayrollAfterTrade = selectedCPUTeam.payroll + salaryOut - salaryIn
@@ -195,10 +212,10 @@ export default class TradingNegotiations extends Component{
                 <hr/>
                 <Row>
                     <Col md={6}>
-                        <SalaryTable payroll={userTeam.payroll} salaryOut={salaryOut} salaryIn={salaryIn} payrollAfter={userPayrollAfterTrade} cap={salaryCap} />
+                        <SalaryTable ratings={fromTeamRatings} payroll={userTeam.payroll} salaryOut={salaryOut} salaryIn={salaryIn} payrollAfter={userPayrollAfterTrade} cap={salaryCap} />
                     </Col>
                     <Col md={6}>
-                        <SalaryTable payroll={selectedCPUTeam.payroll} salaryOut={salaryIn} salaryIn={salaryOut} payrollAfter={cpuPayrollAfterTrade} cap={salaryCap} />
+                        <SalaryTable ratings={toTeamRatings} payroll={selectedCPUTeam.payroll} salaryOut={salaryIn} salaryIn={salaryOut} payrollAfter={cpuPayrollAfterTrade} cap={salaryCap} />
                     </Col>
                 </Row>
                 <hr/>
@@ -214,7 +231,7 @@ export default class TradingNegotiations extends Component{
 }
 
 function SalaryTable(props){
-    const {payroll, salaryIn, salaryOut, payrollAfter, cap} = props;
+    const {payroll, salaryIn, salaryOut, payrollAfter, cap, ratings} = props;
     const className = payrollAfter > cap ? 'danger' : 'success';
     return (
         <Table>
@@ -243,6 +260,10 @@ function SalaryTable(props){
                     <th>Salary Cap</th>
                     <td>${cap}M</td>
                 </tr>
+                {ratings && <tr>
+                    <th>Assessment</th>
+                    <td>{ratings.newRating - ratings.existingRating}</td>
+                </tr>}
             </tbody>
         </Table>
     );

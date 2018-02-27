@@ -2,39 +2,109 @@ const fs = require('fs');
 
 const sourceData = require('./2017-18.NBA.Roster.json');
 
+const firstNames = require('../src/data/first-names.json');
+const surnames = require('../src/data/surnames.json');
+
 const baseData = {
     "options": {
         "startYear": 2018,
-        "salaryCap": 150
+        "salaryCap": 150,
+        //"draftType": "BBL"
     },
     "nextPlayerId": 10000,
-    "seed": 1,
-    "fixtures": [
-        [{"homeId": 1, "awayId": 5}, {"homeId": 9, "awayId": 17}],
-        [{"homeId": 1, "awayId": 9}, {"homeId": 5, "awayId": 17}],
-        [{"homeId": 1, "awayId": 17}, {"homeId": 5, "awayId": 9}],
-        [{"homeId": 5, "awayId": 1}, {"homeId": 17, "awayId": 9}],
-        [{"homeId": 9, "awayId": 1}, {"homeId": 17, "awayId": 5}],
-        [{"homeId": 17, "awayId": 1}, {"homeId": 9, "awayId": 5}]
-    ]
-
+    "seed": 1
 }
 
-const teamNames = ['Cavaliers', 'Warriors', 'Celtics', 'Timberwolves'];
-const numberOfFreeAgents = 10;
+let teamNames = ['Cavaliers', 'Warriors', 'Hawks', 'Timberwolves', 'Celtics', 'Rockets', 'Magic', 'Pistons', 'Knicks', 'Raptors', 'Hornets', 'Bulls'];
+teamNames = undefined;
+
+let teamMappings = {
+    'Warriors': {
+        name: 'Leicester Riders'
+    },
+    'Cavaliers': {
+        name: 'Newcastle Eagles'
+    },
+    'Celtics': {
+        name: 'Surrey Scorchers'
+    },
+    'Hawks': {
+        name: 'Leeds Force'
+    },
+    'Bulls': {
+        name: 'Manchester Giants'
+    },
+    'Magic': {
+        name: 'Plymouth Raiders'
+    },
+    'Pistons': {
+        name: 'Bristol Flyers'
+    },
+    'Knicks': {
+        name: 'Cheshire Phoenix'
+    },
+    'Timberwolves': {
+        name: 'London Lions'
+    },
+    'Hornets': {
+        name: 'Worchester Wolves'
+    },
+    'Rockets': {
+        name: 'Glasgow Rocks'
+    },
+    'Raptors': {
+        name: 'Sheffield Sharks'
+    },    
+}
+teamMappings = {};
+
+let playerMappings = {
+    'Kyrie Irving': {
+        name: 'Tony Hicks'
+    },
+    'Al Horford': {
+        name: 'Tayo Ogedengbe'
+    },
+    'Gordon Hayward': {
+        name: 'Alex Owumi'
+    },
+    'Jaylen Brown': {
+        name: 'Josh Steele'
+    },    
+    'Jayson Tatum': {
+        name: 'Jordan Williams'
+    },
+    'Marcus Morris': {
+        name: 'Gerald Robinson'
+    },
+    'Marcus Smart': {
+        name: 'Elias Desport'
+    },
+    'Terry Rozier': {
+        name: 'Levi Noel'
+    },
+    'Abdel Nader': {
+        name: 'Caylin Raftopoulos'
+    }
+}
+playerMappings = {};
+
 const year = 2018;
 
+let useRandomNames = false;
+
 const teams = sourceData.teams
-    .filter(team => teamNames.includes(team.name))
+    .filter(team => !teamNames || teamNames.includes(team.name))
     .map((team, i) => {
-        const id = team.tid;
+        const id = team.tid + 1;
         const name = `${team.region} ${team.name}`;
-        return {id, name};
+        const mapping = teamMappings[team.name] || {};
+        return Object.assign({id, name}, mapping);
     });
     
 const teamIds = teams.map(team => team.id);
 
-function calculateAbility(ratings) {
+function calculateGMAbility(ratings) {
     return Math.round(
         (4 * ratings.hgt +
             ratings.stre +
@@ -161,23 +231,83 @@ function calculatePosition(ratings) {
     return position;
 }
 
+function calculateScoringAbility(ratings){
+    const {hgt, spd, stre, ins, dnk, tp, fg, jmp} = ratings;
+    return Math.round((hgt*2 + stre + spd*2 + ins*3 + dnk*4 + tp*2 + fg*2) / 16);
+//    const attrs = [ins, dnk, tp, fg];
+//    attrs.sort((a, b) => b - a);
+//    return (attrs[0] + attrs[1] + attrs[2])/3;
+}
+
+function calculateDefensiveAbility(ratings){
+    const {hgt, blk, reb, stl, jmp, stre, spd} = ratings;
+    const attrs = [blk, stl];
+    attrs.sort((a,b) => b-a);
+    return Math.round((attrs[0]*4 + attrs[1]*2 + hgt*2 + stre + spd) / 10);
+}
+
+function calculateRebounding(ratings){
+    const {hgt, jmp, reb} = ratings;
+    return Math.round((hgt*2 + reb*2 + jmp)/5);
+}
+
+function calculatePassing(ratings){
+    const {drb, pss, spd, stre} = ratings;
+    return Math.round((100 + drb + pss*3 + spd + stre)/8);
+}
+
+function calculateAbility(stamina, scoring, defense, rebounding, passing){
+    const attrs = [defense, rebounding, passing];
+    attrs.sort((a,b) => b - a);
+    //return Math.round((stamina*2 + scoring*4 + attrs[0]*2 + attrs[1]*2)/10);
+    return Math.round((stamina + scoring + defense + rebounding + passing)/5);
+}
+
+function massageRating(rating){
+    rating = rating * 1.075;
+    if(rating > 99) rating = 99;
+    return Math.round(rating);
+}
+
+function getRandomName(){
+    let n1 = Math.round(Math.random() * firstNames.length);
+    let n2 = Math.round(Math.random() * surnames.length);
+    const firstName = firstNames[n1];
+    const surname = surnames[n2];
+    const name = firstName + " " + surname;
+    return name;
+}
+
 const players = sourceData.players
-    .filter(player => [-1].concat(teamIds).includes(player.tid))
+    .filter(player => [0].concat(teamIds).includes(player.tid+1))
     .map((player, i) => {
         const id = i;
-        const teamId = player.tid === -1 ? null : player.tid;
-        const name = player.name;
+        const teamId = player.tid < 0 ? player.tid : player.tid + 1;
+        const name = useRandomNames ? getRandomName() : player.name;
         const dob = player.born.year;
         const age = year - 1 - dob;
         const contractExpiry = player.contract.exp;
-        let potential = player.ratings[0].pot;
-        const ability = calculateAbility(player.ratings[0]);
         const prime = 30;
-        if(age >= prime) potential = ability;
+        const ratings = player.ratings[0];
+        let potential = ratings.pot;
+        const stamina = ratings.endu;
+        const scoring = massageRating(calculateScoringAbility(ratings));
+        const defense = massageRating(calculateDefensiveAbility(ratings));
+        const rebounding = massageRating(calculateRebounding(ratings));
+        const passing = massageRating(calculatePassing(ratings));
+        const gmAbility = calculateGMAbility(ratings);
+        const ability = calculateAbility(stamina, scoring, defense, rebounding, passing);
+        potential = potential + (ability - gmAbility);
+        if(age >= prime || potential < ability) potential = ability;
+        if(age < prime) potential = Math.min(potential, ability + ((prime-age)*5));
+        if(gmAbility > 60){
+            console.log(player);
+            //console.log(stamina, scoring, defense, rebounding, passing, ability, gmAbility, potential, name);
+        }
         const decline = 2.5;
-        const draftYear = 1970;
-        const position = calculatePosition(player.ratings[0]);
-        return {
+        const draftYear = player.draft.year || 1970;
+        const position = calculatePosition(ratings);
+        const output = {
             id,
             teamId,
             name,
@@ -188,8 +318,15 @@ const players = sourceData.players
             prime,
             decline,
             draftYear,
-            position
+            position,
+            scoring,
+            defense,
+            rebounding,
+            passing,
+            stamina
         };
+        const mapping = playerMappings[player.name] || {};
+        return Object.assign(output, mapping);
     });
     
 const standings = teams.map(team => ({ teamId: team.id, played: 0, won: 0, lost: 0}));

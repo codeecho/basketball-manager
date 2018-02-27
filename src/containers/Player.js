@@ -7,6 +7,8 @@ const mapStateToProps = (state, ownProps) => {
     
   const {gameState, teams, players} = state;  
   
+  const tab = ownProps.match.params.tab;
+  
   const playerId = ownProps.match.params.id * 1;
   
   const player = players.find(player => player.id === playerId);
@@ -20,13 +22,33 @@ const mapStateToProps = (state, ownProps) => {
   const isUserPlayer = player.teamId === gameState.teamId;
   
   const isFreeAgent = player.teamId === FREE_AGENT_TEAM_ID;
+  
+  const playerRatings = state.playerRatings.find(x => x.playerId === playerId) || { games: 0, ppg: 0, apg: 0, rpg: 0};
+  
+  const playerRatingHistory = [];
+  
+  state.fixtures.forEach(round => {
+      round.forEach(fixture => {
+          if(!fixture.homePlayerRatings) return;
+          const ratings = fixture.homePlayerRatings.concat(fixture.awayPlayerRatings).find(ratings => ratings.playerId === playerId);
+          if(ratings) {
+              const opponentId = [fixture.homeId, fixture.awayId].find(x => x !== player.teamId);
+              const opponent = teams.find(team => team.id === opponentId);
+              playerRatingHistory.push(Object.assign({}, ratings, {opponent}));
+          }
+
+      })
+  })
 
   return {
+    tab,
     isContractExpiring,
     player,
     team,
     isUserPlayer,
-    isFreeAgent
+    isFreeAgent,
+    playerRatings,
+    playerRatingHistory
   };
 };
 

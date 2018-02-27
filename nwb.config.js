@@ -3,7 +3,7 @@ module.exports = {
   devServer: {
       disableHostCheck: true
   },
-//  webpack: {
-//    publicPath: 'http://codeecho.co.uk/basketball-manager/'
-//  }
+  webpack: {
+    publicPath: ''
+  }
 }

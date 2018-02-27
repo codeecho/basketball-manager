@@ -29,7 +29,8 @@ export default class GameStateBuilder{
                 isHost: false,
                 users: [],
                 playersReady: []
-            }
+            },
+            playerRatings: []
         };
     }
     

@@ -15,7 +15,7 @@ export default class PlayerService{
         
         const rating = player.realAbility + nextDelta;
         
-        let expectedSalary = Math.pow(rating-35, 2) *0.017;
+        let expectedSalary = Math.pow(rating-40, 2) *0.017;
         
         // Adjust for aging players
         if(yearsToPrime < 0){

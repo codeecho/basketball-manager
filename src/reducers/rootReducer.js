@@ -28,7 +28,18 @@ const persistenceService = new PersistenceService();
 
 const initialState = persistenceService.loadCurrentGame() || gameStateBuilder.buildNewGameState();
 
+const saveActions = [SET_TEAM, SIGN_FREE_AGENT, EXTEND_CONTRACT, COMPLETE_TRADE, RELEASE_PLAYER, SAVE_RESULTS,
+    HANDLE_EXPIRING_CONTRACTS, APPLY_TRAINING, DO_DRAFT, CREATE_FREE_AGENTS, AI_SIGN_FREE_AGENTS, END_SEASON];
+
 const rootReducer = (state = initialState, action) => {
+    const newState = handleAction(state, action);
+    if(saveActions.includes(action.type)){
+       persistenceService.saveGame(newState);
+    }
+    return newState;
+};
+
+function handleAction(state, action){
     switch (action.type) {
         case NEW_GAME: {
             persistenceService.newGame();
@@ -66,7 +77,7 @@ const rootReducer = (state = initialState, action) => {
         
         default: return state;
     }
-};
+}
 
 export default rootReducer;
 

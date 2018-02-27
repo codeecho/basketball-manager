@@ -13,11 +13,23 @@ const mapStateToProps = (state, ownProps) => {
   const otherUserTeamIds = state.onlineGame.users.map(user => user.teamId);
   
   const {teamId} = gameState;
+  
+  const tab = ownProps.match.params.tab;
+  
+  const playerRatings = state.playerRatings.map(ratings => {
+      const player = state.players.find(player => player.id === ratings.playerId);
+      return Object.assign({}, player, {ratings});
+  });
+  
+  const players = state.players;
 
   return {
+    tab,
     standings,
     teamId,
-    otherUserTeamIds
+    otherUserTeamIds,
+    players,
+    playerRatings
   };
 };
 

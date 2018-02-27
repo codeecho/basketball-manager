@@ -14,15 +14,27 @@ export default class PlayerBuilder{
         this.playerService = new PlayerService();
     }
     
-    buildDraftPlayer(year, id){
+    calculateAbility(stamina, scoring, defense, rebounding, passing){
+        const attrs = [defense, rebounding, passing];
+        attrs.sort((a,b) => b - a);
+        //return Math.round((stamina*2 + scoring*4 + attrs[0]*2 + attrs[1]*2)/10);
+        return Math.round((stamina + scoring + defense + rebounding + passing)/5);
+    }
+    
+    buildDraftPlayer(year, id, upperBound){
         const name = this.randomizer.getRandomItem(firstNames) + ' ' + this.randomizer.getRandomItem(surnames);
-        const ability = this.randomizer.getRandomInteger(25, 55);
-        const potential = this.randomizer.getRandomInteger(ability+5, ability+40);
         const age = this.randomizer.getRandomInteger(19, 22);
         const prime = this.randomizer.getRandomInteger(28, 31);
         const decline = 2.5;
         const dob = year - age - 1;
         const position = this.randomizer.getRandomItem(positions);
+        const stamina = this.randomizer.getRandomInteger(80, 95);
+        const scoring = this.randomizer.getRandomInteger(25, 60);
+        const defense = this.randomizer.getRandomInteger(25, 60);
+        const rebounding = this.randomizer.getRandomInteger(25, 60);
+        const passing = this.randomizer.getRandomInteger(25, 60);
+        const ability = this.calculateAbility(stamina, scoring, defense, rebounding, passing);
+        const potential = this.randomizer.getRandomInteger(ability+5, Math.min(ability+40, Math.max(upperBound, ability)));        
         const player = {
             id,
             teamId: UNDRAFTED_TEAM_ID, 
@@ -38,7 +50,12 @@ export default class PlayerBuilder{
             prime,
             decline,
             draftYear: year,
-            position
+            position,
+            stamina,
+            scoring,
+            defense,
+            rebounding,
+            passing
         };
         const expectedSalary = this.playerService.calculateExpectedSalary(player);
         return Object.assign({}, player, {expectedSalary});

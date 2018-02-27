@@ -53,6 +53,8 @@ export default class SeasonReducer{
     }
     
     applyTraining(action, state){
+        const {seed} = action;
+        const randomizer = new Randomizer(seed);
         return stateModifier.modifyPlayers(state, player => {
             if(player.teamId === UNDRAFTED_TEAM_ID) return;
             if(player.teamId === FREE_AGENT_TEAM_ID) return;
@@ -61,8 +63,13 @@ export default class SeasonReducer{
             const realAbility = player.realAbility + realDelta;
             const ability = Math.floor(realAbility);
             const delta = ability - originalAbility;
-            const expectedSalary = this.playerService.calculateExpectedSalary(Object.assign({}, player, {delta, ability, realAbility}));
-            return { delta, ability, realAbility, expectedSalary };
+            const attrDeltas = getAttributeDeltas(randomizer, delta);
+            const scoring = player.scoring + attrDeltas[0];
+            const defense = player.defense + attrDeltas[1];
+            const rebounding = player.rebounding + attrDeltas[2];
+            const passing = player.passing + attrDeltas[3];            
+            const expectedSalary = this.playerService.calculateExpectedSalary(Object.assign({}, player, {delta, ability, realAbility, scoring, defense, rebounding, passing}));
+            return { delta, ability, realAbility, expectedSalary, scoring, defense, rebounding, passing };
         });
     }
     
@@ -81,11 +88,13 @@ export default class SeasonReducer{
             const players = state.players.concat(draft);
             const stage = GAME_STATE_FREE_AGENCY;
             const gameState = Object.assign({}, state.gameState, {stage});
-            return Object.assign({}, state, {gameState, nextPlayerId, players});
+            const newState = Object.assign({}, state, {gameState, nextPlayerId, players});
+            return this.handleExpiringContracts(action, newState);
         }
         
         const {year, teamId} = state.gameState;
         let draft = state.players.filter(player => player.draftYear === year);
+        draft.sort((a, b) => b.potential - a.potential);
         let players = state.players.concat();
         const standings = state.standings.concat();
         standings.sort((a, b) => a.won - b.won);
@@ -240,15 +249,32 @@ export default class SeasonReducer{
         const gameState = Object.assign({}, state.gameState, { round, stage, year});
         
         const fixtures = state.fixtures.map(round => {
-            return round.map(fixture => Object.assign({}, fixture, {winnerId: undefined, loserId: undefined, homeScore: undefined, awayScore: undefined}));
+            return round.map(fixture => Object.assign({}, fixture, {winnerId: undefined, loserId: undefined, homeScore: undefined, awayScore: undefined, homePlayerRatings: [], awayPlayerRatings: []}));
         });
         
         state = stateModifier.modifyGameState(state, { round, stage, year });
         state = stateModifier.modifyStandings(state, () => ({played: 0, won: 0, lost: 0}));
         state = stateModifier.modifyPlayers(state, player => ({ age: year - player.dob -1 }));
-        return Object.assign({}, state, {fixtures});
+        return Object.assign({}, state, {fixtures, playerRatings: []});
     }
     
+}
+
+function getAttributeDeltas(randomizer, delta){
+    if(delta <= 0) return [delta, delta, delta, delta];
+    const total = delta * 4;
+    const deltas = [];
+    const lowerBand = Math.max(delta-3, 0);
+    const upperBand = delta+3;
+    let allocated = 0;
+    for(let i=0; i< 3; i++){
+        let n = randomizer.getRandomInteger(lowerBand, upperBand);
+        n = Math.min(n, total-allocated);
+        allocated += n;
+        deltas.push(n);
+    }
+    deltas.push(total-allocated);
+    return deltas;
 }
 
 

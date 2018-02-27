@@ -18,6 +18,8 @@ export default class FixturesReducer{
         const standings = state.standings.concat();
         const fixtures = state.fixtures.concat();
         
+        const playerRatings = state.playerRatings.concat();
+        
         let roundNo = state.gameState.round;
         
         results.forEach((roundResults, i) => {
@@ -25,11 +27,11 @@ export default class FixturesReducer{
             const round = fixtures[roundNo+i];
             
             roundResults.forEach(result => {
-                const {fixtureId, winnerId, loserId, homeScore, awayScore} = result;
+                const {fixtureId, winnerId, loserId, homeScore, awayScore, homePlayerRatings, awayPlayerRatings} = result;
             
                 const fixture = round.find(fixture => fixture.id === fixtureId);
                 
-                Object.assign(fixture, {winnerId, loserId, homeScore, awayScore});
+                Object.assign(fixture, {winnerId, loserId, homeScore, awayScore, homePlayerRatings, awayPlayerRatings});
                 
                 const winnerStanding = standings.find(standing => standing.teamId === winnerId);
                 winnerStanding.played++;
@@ -38,6 +40,10 @@ export default class FixturesReducer{
                 const loserStanding = standings.find(standing => standing.teamId === loserId);
                 loserStanding.played++;
                 loserStanding.lost++;
+                
+                updatePlayerRatings(playerRatings, homePlayerRatings);
+                updatePlayerRatings(playerRatings, awayPlayerRatings);                
+                
             });
             
         });
@@ -57,13 +63,31 @@ export default class FixturesReducer{
         }
         
         const gameState = Object.assign({}, state.gameState, { round: roundNo, stage });
-        const newState = Object.assign({}, state, { standings, gameState, fixtures });
-        
-        this.persistenceService.saveGame(newState);
+        const newState = Object.assign({}, state, { standings, gameState, fixtures, playerRatings });
         
         return newState;
     }
     
+}
+
+function updatePlayerRatings(playerRatings, teamRatings){
+    teamRatings.forEach(ratings => {
+        const {playerId, points, assists, rebounds} = ratings;
+        let existingRatings = playerRatings.find(x => x.playerId === playerId);
+        if(!existingRatings){
+            existingRatings = { playerId, games: 0, ppg: 0, apg: 0, rpg: 0};
+            playerRatings.push(existingRatings);
+        }
+        const {games, ppg, apg, rpg} = existingRatings;
+        existingRatings.ppg = roundTo2dp(((ppg * games) + points) / (games+1));
+        existingRatings.apg = roundTo2dp(((apg * games) + assists) / (games+1));
+        existingRatings.rpg = roundTo2dp(((rpg * games) + rebounds) / (games+1)); 
+        existingRatings.games = games + 1;
+    });
+}
+
+function roundTo2dp(n){
+    return Math.round(n*100)/100;
 }
 
 
