@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Table} from 'react-bootstrap';
+import {Table, Button} from 'react-bootstrap';
 
 export default function TeamFixtures(props){
     
@@ -9,7 +9,7 @@ export default function TeamFixtures(props){
     return (
         <Table striped className="text-center">
             <tbody>
-                {fixtures.map(fixture => <Fixture fixture={fixture} team={team}/>)}
+                {fixtures.map((fixture, i) => <Fixture fixture={fixture} index={i} team={team}/>)}
             </tbody>
         </Table>
     );
@@ -17,18 +17,19 @@ export default function TeamFixtures(props){
 }
 
 function Fixture(props){
-    const {fixture, team} = props;
+    const {fixture, index, team} = props;
     const {winnerId, homeScore, awayScore} = fixture;
-    const winOrLose = !winnerId ? '' : winnerId === team.id ? 'W' : 'L'
+    const winOrLose = !winnerId ? undefined : winnerId === team.id ? 'W' : 'L'
     const className = !winnerId ? '' : winnerId === team.id ? 'success' : 'danger'    
     const score = !winnerId ? '' : `${awayScore} - ${homeScore}`;
+    const fixtureHref = `#/fixture/${index}/${fixture.id}`;
     return (
         <tr className={className}>
             <td>{winOrLose}</td>
             <td>{fixture.awayTeam.name}</td>
             <td> at </td>
             <td>{fixture.homeTeam.name}</td>
-            <td>{score}</td>
+            <td>{winOrLose && <a href={fixtureHref}>{score}</a>}</td>
         </tr>
     );
 }

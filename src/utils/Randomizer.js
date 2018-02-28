@@ -47,6 +47,21 @@ export default class Randomizer{
         return min + (this.random() * (max-min));
     }
     
+    getRandomWeightedIndex(weights){
+        const n = Math.random();
+        let result = 0;
+        let t = 0;
+        for(let i=0; i< weights.length; i++){
+            const x = weights[i];
+            t += x;
+            if(n <= t){
+                result = i;
+                break;
+            }
+        };
+        return result;
+    }
+    
 }
 
 

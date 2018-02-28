@@ -47,7 +47,7 @@ class App extends Component {
                         <Route path="/draft" exact={true} render={(props) => <Draft {...props} />} />
                         <Route path="/tradingBlock" exact={true} render={(props) => <TradingBlock {...props} />} />                        
                         <Route path="/trade" exact={true} render={(props) => <TradeNegotiations {...props} />} />                         
-                        <Route path="/fixture/:id" exact={true} render={(props) => <Fixture {...props} />} />                                                 
+                        <Route path="/fixture/:round/:id" exact={true} render={(props) => <Fixture {...props} />} />                                                 
                         <Route path="/settings" exact={true} render={(props) => <Settings {...props} />} />                                                 
                         <Route path="/teams/god" exact={true} render={(props) => <TeamsGodMode {...props} />} />                                                                         
                         <Route path="/load" exact={true} render={(props) => <LoadGame {...props} />} />                                                                         
