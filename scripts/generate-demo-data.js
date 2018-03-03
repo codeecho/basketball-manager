@@ -341,6 +341,7 @@ const testOptions = {
     startYear: 2018,
     salaryCap: 150,
     numberOfPlayoffTeams: 4,
+    fixturesType: "BBL",
     playoffType: "NBA",
     draftType: "NBA"
 };
@@ -348,6 +349,7 @@ const bblOptions = {
     startYear: 2018,
     salaryCap: 150,
     numberOfPlayoffTeams: 8,
+    fixturesType: "BBL",    
     playoffType: "BBL",
     draftType: "BBL"
 };
@@ -355,6 +357,7 @@ const nbaOptions = {
     startYear: 2018,    
     salaryCap: 150,
     numberOfPlayoffTeams: 16,
+    fixturesType: "NBA",
     playoffType: "NBA",
     draftType: "NBA"
 };

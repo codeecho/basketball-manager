@@ -40,6 +40,9 @@ export default class GameSetupReducer{
         }
         
         let fixtures = fixtureListGenerator.generate(data.teams);
+        if(data.options.fixturesType === 'BBL'){
+            fixtures = fixtures.concat(fixtureListGenerator.generate(data.teams, false));
+        }
         
         fixtures = fixtures.map(round => {
             return round.map((fixture, i) => {

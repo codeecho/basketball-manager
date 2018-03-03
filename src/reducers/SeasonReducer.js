@@ -54,20 +54,22 @@ export default class SeasonReducer{
         
         const firstRound = topTeamIds.map((homeId, i) => {
             const awayId = teamIds[teamIds.length - i - 1];
-            return {id: i, homeId, awayId};
+            return {id: i, homeId, awayId, playoff:true};
         });
-        
-        const allRounds = [false, false, true, true, false, false, true].map(switchTeams => {
-            return firstRound.map(fixture => {
-                if(!switchTeams) return Object.assign({}, fixture);
-                return {id: fixture.id, homeId: fixture.awayId, awayId: fixture.homeId};
-            })
-        })
         
         const isFinal = firstRound.length === 1;
         
+        const homeOrAway = state.options.playoffType === 'BBL' ? isFinal ? [false] : [false, true] : [false, false, true, true, false, false, true];
+        
+        const allRounds = homeOrAway.map(switchTeams => {
+            return firstRound.map(fixture => {
+                if(!switchTeams) return Object.assign({}, fixture);
+                return {id: fixture.id, homeId: fixture.awayId, awayId: fixture.homeId, playoff:true};
+            })
+        })
+        
         const playoffRound = firstRound.map(fixture => {
-            return {id: fixture.id, homeId: fixture.homeId, awayId: fixture.awayId, homeWins: 0, awayWins: 0};
+            return {id: fixture.id, homeId: fixture.homeId, awayId: fixture.awayId, played: 0, homeWins: 0, awayWins: 0, homeScore: 0, awayScore: 0};
         });
         
         const fixtures = state.fixtures.concat(allRounds);
@@ -326,7 +328,7 @@ export default class SeasonReducer{
         
         const gameState = Object.assign({}, state.gameState, { round, stage, year});
         
-        const fixtures = state.fixtures.slice(0, (state.teams.length-1) * 2).map(round => {
+        const fixtures = state.fixtures.filter(fixture => !fixture.playoff).map(round => {
             return round.map(fixture => Object.assign({}, fixture, {winnerId: undefined, loserId: undefined, homeScore: undefined, awayScore: undefined, homePlayerRatings: [], awayPlayerRatings: []}));
         });
         

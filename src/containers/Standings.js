@@ -3,7 +3,9 @@ import Standings from '../pages/Standings';
 
 const mapStateToProps = (state, ownProps) => {
 
-    const {gameState, teams} = state;
+    const {gameState, teams, options} = state;
+
+  const {playoffType} = options;
 
   const standings = state.standings.map(standing => {
      const team = teams.find(team => team.id === standing.teamId);
@@ -38,7 +40,8 @@ const mapStateToProps = (state, ownProps) => {
     otherUserTeamIds,
     players,
     playerRatings,
-    playoffs
+    playoffs,
+    playoffType
   };
 };
 

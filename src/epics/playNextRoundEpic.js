@@ -38,7 +38,7 @@ export const playNextRoundEpic = (action$, store) =>
             const roundResults = fixtures.map(fixture => {
                 const {homeId, awayId, id} = fixture;
                 
-                if(state.gameState.stage === GAME_STATE_PLAYOFFS){
+                if(state.gameState.stage === GAME_STATE_PLAYOFFS && state.options.playoffType !== 'BBL'){
                     const playoffFixture = playoffRound.find(fixture => fixture.id === id);
                     if(playoffFixture.winnerId) return {fixtureId: id, cancelled: true};
                 }
@@ -59,7 +59,7 @@ export const playNextRoundEpic = (action$, store) =>
                     toast.error(` L - ${winner.name} ${awayScore} - ${homeScore}`);
                 }
                 
-                if(state.gameState.stage === GAME_STATE_PLAYOFFS){
+                if(state.gameState.stage === GAME_STATE_PLAYOFFS && state.options.playoffType !== 'BBL'){
                     const playoffFixture = playoffRound.find(fixture => fixture.id === id);
                     if(playoffFixture.homeId === winner.id) playoffFixture.homeWins += 1;
                     if(playoffFixture.awayId === winner.id) playoffFixture.awayWins += 1;

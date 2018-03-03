@@ -44,11 +44,22 @@ export default class FixturesReducer{
                     loserStanding.lost++;
                 
                 }else if(state.gameState.stage === GAME_STATE_PLAYOFFS){
-                    const playoffRound = playoffs[playoffs.length-1].find(round => round.id === fixtureId);
-                    if(playoffRound.homeId === winnerId) playoffRound.homeWins += 1;
-                    if(playoffRound.awayId === winnerId) playoffRound.awayWins += 1;
-                    if(playoffRound.homeWins === 4) playoffRound.winnerId = playoffRound.homeId;
-                    if(playoffRound.awayWins === 4) playoffRound.winnerId = playoffRound.awayId;
+                    const playoffRound = playoffs[playoffs.length-1];
+                    const playoffFixture = playoffRound.find(round => round.id === fixtureId);
+                    if(playoffFixture.homeId === winnerId) playoffFixture.homeWins += 1;
+                    if(playoffFixture.awayId === winnerId) playoffFixture.awayWins += 1;
+                    playoffFixture.played += 1;
+                    playoffFixture.homeScore += homeScore;
+                    playoffFixture.awayScore += awayScore;
+                    if(state.options.playoffType === 'BBL'){
+                        if(playoffFixture.played === 2 || (playoffRound.length === 1 && playoffFixture.played === 1)){
+                            if(playoffFixture.homeScore > playoffFixture.awayScore) playoffFixture.winnerId = playoffFixture.homeId;
+                            else playoffFixture.winnerId = playoffFixture.awayId;
+                        }
+                    }else{
+                        if(playoffFixture.homeWins === 4) playoffFixture.winnerId = playoffFixture.homeId;
+                        if(playoffFixture.awayWins === 4) playoffFixture.winnerId = playoffFixture.awayId;                        
+                    }
                 }
                 
                 updatePlayerRatings(playerRatings, homePlayerRatings);
