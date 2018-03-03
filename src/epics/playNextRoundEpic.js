@@ -4,6 +4,8 @@ import Randomizer from '../utils/Randomizer';
 import stateSelector from '../utils/stateSelector';
 import TeamService from '../services/TeamService';
 
+import {GAME_STATE_REGULAR_SEASON, GAME_STATE_PLAYOFFS} from '../constants';
+
 import {toast} from 'react-toastify';
 
 const teamService = new TeamService();
@@ -24,6 +26,8 @@ export const playNextRoundEpic = (action$, store) =>
         
         const results = [];
         
+        const playoffRound = state.playoffs.length > 0 ? state.playoffs[state.playoffs.length-1].map(fixture => Object.assign({}, fixture)) : [];
+        
         for(let i=0; i < numberOfRounds; i++){
             const roundNo = round + i;
             
@@ -33,6 +37,11 @@ export const playNextRoundEpic = (action$, store) =>
             
             const roundResults = fixtures.map(fixture => {
                 const {homeId, awayId, id} = fixture;
+                
+                if(state.gameState.stage === GAME_STATE_PLAYOFFS){
+                    const playoffFixture = playoffRound.find(fixture => fixture.id === id);
+                    if(playoffFixture.winnerId) return {fixtureId: id, cancelled: true};
+                }
                 
                 const homeTeam = stateSelector.getTeam(state, homeId);
                 const awayTeam = stateSelector.getTeam(state, awayId);
@@ -50,6 +59,14 @@ export const playNextRoundEpic = (action$, store) =>
                     toast.error(` L - ${winner.name} ${awayScore} - ${homeScore}`);
                 }
                 
+                if(state.gameState.stage === GAME_STATE_PLAYOFFS){
+                    const playoffFixture = playoffRound.find(fixture => fixture.id === id);
+                    if(playoffFixture.homeId === winner.id) playoffFixture.homeWins += 1;
+                    if(playoffFixture.awayId === winner.id) playoffFixture.awayWins += 1;
+                    if(playoffFixture.homeWins === 4) playoffFixture.winnerId = playoffFixture.homeId;
+                    if(playoffFixture.awayWins === 4) playoffFixture.winnerId = playoffFixture.awayId;                    
+                }
+                
                 return {
                    fixtureId: id,
                    winnerId: winner.id,
@@ -58,10 +75,31 @@ export const playNextRoundEpic = (action$, store) =>
                    awayScore,
                    homePlayerRatings,
                    awayPlayerRatings
-                }
-            }); 
+                };
+            });
             
             results.push(roundResults);
+        }
+        
+        if(round + results.length === state.fixtures.length){
+            if(state.gameState.stage === GAME_STATE_REGULAR_SEASON){
+                return Observable.concat(
+                    Observable.of(actions.saveResults(results)),
+                    Observable.of(actions.endRegularSeason()),
+                    Observable.of(actions.createNextPlayoffRound(true))
+                );
+            }else if(state.gameState.stage === GAME_STATE_PLAYOFFS){
+                if(state.fixtures[round + results.length -1].length === 1){
+                    return Observable.concat(
+                        Observable.of(actions.saveResults(results)),
+                        Observable.of(actions.endPlayoffs())
+                    );
+                }
+                return Observable.concat(
+                    Observable.of(actions.saveResults(results)),
+                    Observable.of(actions.createNextPlayoffRound())
+                );                   
+            }
         }
         
         return Observable.of(actions.saveResults(results));

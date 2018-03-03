@@ -1,10 +1,6 @@
 import PersistenceService from '../services/PersistenceService';
 
-import {toast} from 'react-toastify';
-
-import ordinal from 'ordinal'
-
-import { GAME_STATE_REGULAR_SEASON, GAME_STATE_POST_SEASON } from '../constants';
+import { GAME_STATE_REGULAR_SEASON, GAME_STATE_PLAYOFFS, GAME_STATE_POST_SEASON } from '../constants';
 
 export default class FixturesReducer{
     
@@ -22,24 +18,38 @@ export default class FixturesReducer{
         
         let roundNo = state.gameState.round;
         
+        let playoffs = state.playoffs.concat();
+        
         results.forEach((roundResults, i) => {
             
             const round = fixtures[roundNo+i];
             
             roundResults.forEach(result => {
-                const {fixtureId, winnerId, loserId, homeScore, awayScore, homePlayerRatings, awayPlayerRatings} = result;
+                const {fixtureId, winnerId, loserId, homeScore, awayScore, homePlayerRatings, awayPlayerRatings, cancelled} = result;
+                
+                if(cancelled) return;
             
                 const fixture = round.find(fixture => fixture.id === fixtureId);
                 
                 Object.assign(fixture, {winnerId, loserId, homeScore, awayScore, homePlayerRatings, awayPlayerRatings});
                 
-                const winnerStanding = standings.find(standing => standing.teamId === winnerId);
-                winnerStanding.played++;
-                winnerStanding.won++;
+                if(state.gameState.stage === GAME_STATE_REGULAR_SEASON){
                 
-                const loserStanding = standings.find(standing => standing.teamId === loserId);
-                loserStanding.played++;
-                loserStanding.lost++;
+                    const winnerStanding = standings.find(standing => standing.teamId === winnerId);
+                    winnerStanding.played++;
+                    winnerStanding.won++;
+                    
+                    const loserStanding = standings.find(standing => standing.teamId === loserId);
+                    loserStanding.played++;
+                    loserStanding.lost++;
+                
+                }else if(state.gameState.stage === GAME_STATE_PLAYOFFS){
+                    const playoffRound = playoffs[playoffs.length-1].find(round => round.id === fixtureId);
+                    if(playoffRound.homeId === winnerId) playoffRound.homeWins += 1;
+                    if(playoffRound.awayId === winnerId) playoffRound.awayWins += 1;
+                    if(playoffRound.homeWins === 4) playoffRound.winnerId = playoffRound.homeId;
+                    if(playoffRound.awayWins === 4) playoffRound.winnerId = playoffRound.awayId;
+                }
                 
                 updatePlayerRatings(playerRatings, homePlayerRatings);
                 updatePlayerRatings(playerRatings, awayPlayerRatings);                
@@ -52,18 +62,8 @@ export default class FixturesReducer{
         
         roundNo = roundNo + results.length;
         
-        const stage = roundNo < state.fixtures.length ? GAME_STATE_REGULAR_SEASON : GAME_STATE_POST_SEASON;
-        
-        if(stage === GAME_STATE_POST_SEASON){
-            const standing = standings.find(standing => standing.teamId === state.gameState.teamId);
-            const position = standings.indexOf(standing) + 1;
-            if(position > 0){
-                toast.info(`You finished ${ordinal(position)}`);
-            }
-        }
-        
-        const gameState = Object.assign({}, state.gameState, { round: roundNo, stage });
-        const newState = Object.assign({}, state, { standings, gameState, fixtures, playerRatings });
+        const gameState = Object.assign({}, state.gameState, { round: roundNo });
+        const newState = Object.assign({}, state, { standings, gameState, fixtures, playerRatings, playoffs });
         
         return newState;
     }

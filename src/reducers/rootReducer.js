@@ -1,8 +1,9 @@
-import { LOAD_GAME_DATA, SET_TEAM, SAVE_RESULTS, END_SEASON, ADD_LOG_MESSAGE, REMOVE_LOG_MESSAGE, 
+import { LOAD_GAME_DATA, SET_TEAM, SAVE_RESULTS, END_REGULAR_SEASON, END_SEASON, ADD_LOG_MESSAGE, REMOVE_LOG_MESSAGE, 
     HOST_ONLINE_GAME, CLIENT_USER_CONNECTED, CLIENT_USER_DISCONNECTED, CLIENT_PLAYER_READY, JOIN_ONLINE_GAME,
     CLIENT_ADVANCE, NEW_GAME, SIGN_FREE_AGENT, HANDLE_EXPIRING_CONTRACTS, CREATE_FREE_AGENTS, AI_SIGN_FREE_AGENTS,
     EXTEND_CONTRACT, DO_DRAFT, APPLY_TRAINING, SET_TRADE_PROPOSAL, COMPLETE_TRADE, RELEASE_PLAYER, CLIENT_GAME_STATE,
-    CLIENT_SIGN_FREE_AGENT, CLIENT_EXTEND_CONTRACT, CLIENT_RELEASE_PLAYER, CLIENT_COMPLETE_TRADE} from '../actions';
+    CLIENT_SIGN_FREE_AGENT, CLIENT_EXTEND_CONTRACT, CLIENT_RELEASE_PLAYER, CLIENT_COMPLETE_TRADE, CREATE_NEXT_PLAYOFF_ROUND,
+    END_PLAYOFFS } from '../actions';
     
 import { GAME_STATE_REGULAR_SEASON } from '../constants';
 
@@ -29,7 +30,8 @@ const persistenceService = new PersistenceService();
 const initialState = persistenceService.loadCurrentGame() || gameStateBuilder.buildNewGameState();
 
 const saveActions = [SET_TEAM, SIGN_FREE_AGENT, EXTEND_CONTRACT, COMPLETE_TRADE, RELEASE_PLAYER, SAVE_RESULTS,
-    HANDLE_EXPIRING_CONTRACTS, APPLY_TRAINING, DO_DRAFT, CREATE_FREE_AGENTS, AI_SIGN_FREE_AGENTS, END_SEASON];
+    HANDLE_EXPIRING_CONTRACTS, APPLY_TRAINING, DO_DRAFT, CREATE_FREE_AGENTS, AI_SIGN_FREE_AGENTS, END_SEASON, 
+    CREATE_NEXT_PLAYOFF_ROUND, END_PLAYOFFS, END_REGULAR_SEASON];
 
 const rootReducer = (state = initialState, action) => {
     const newState = handleAction(state, action);
@@ -60,6 +62,9 @@ function handleAction(state, action){
         case DO_DRAFT: return seasonReducer.doDraft(action, state);
         case CREATE_FREE_AGENTS: return seasonReducer.createFreeAgents(action, state);
         case AI_SIGN_FREE_AGENTS: return seasonReducer.aiSignFreeAgents(action, state);
+        case END_REGULAR_SEASON: return seasonReducer.endRegularSeason(action, state);
+        case CREATE_NEXT_PLAYOFF_ROUND: return seasonReducer.createNextPlayoffRound(action, state);
+        case END_PLAYOFFS: return seasonReducer.endPlayoffs(action, state);
         case END_SEASON: return seasonReducer.endSeason(action, state);
         
         case SAVE_RESULTS: return fixturesReducer.saveResults(action, state);

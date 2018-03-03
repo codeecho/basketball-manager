@@ -6,8 +6,9 @@ import PageWrapper from '../containers/PageWrapper';
 import TeamLink from '../components/TeamLink';
 import PlayerStatsTable from '../components/PlayerStatsTable';
 import PlayerTable from '../containers/PlayerTable';
+import Playoffs from './tabs/Playoffs';
 
-import {standingsTabs, STATS_TAB_ID, RATINGS_TAB_ID} from './tabs/tabs';
+import {standingsTabs, STATS_TAB_ID, RATINGS_TAB_ID, PLAYOFFS_TAB_ID} from './tabs/tabs';
 
 export default function Home(props){
     
@@ -18,6 +19,8 @@ export default function Home(props){
             return <PlayerStatsTable players={playerRatings} highlightTeam={teamId}/>;
         }else if(tab === RATINGS_TAB_ID){
             return <PlayerTable players={players} highlightTeam={teamId} limit={50}/>;
+        }else if(tab === PLAYOFFS_TAB_ID){
+            return <Playoffs {...props}/>
         }else{
             return (
                 <div>

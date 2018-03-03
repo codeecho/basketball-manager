@@ -7,7 +7,7 @@ const mapStateToProps = (state, ownProps) => {
 
   const {gameState, onlineGame, options} = state;
   
-  const {stage, logMessages, teamId, year} = gameState;
+  const {stage, logMessages, teamId, year, round} = gameState;
   
   const {isHost, users, playersReady} = onlineGame;
   
@@ -33,7 +33,8 @@ const mapStateToProps = (state, ownProps) => {
     waitingForPlayers,
     onlineGame,
     canAdvance,
-    draftType
+    draftType,
+    round
   };
 };
 

@@ -11,7 +11,3 @@ export const loadBBLDataEpic = (action$) =>
     .switchMap(() => {
         return Observable.of(actions.loadGameData(data));
     });
-
-
-// WEBPACK FOOTER //
-// src/epics/loadBBLDataEpic.js

@@ -1,0 +1,1 @@
+node generate-demo-data.js && mv bbl.json ../src/data/ && mv test.json ../src/data/ && mv demo.json ../src/data/

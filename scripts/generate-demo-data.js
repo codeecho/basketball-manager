@@ -9,16 +9,15 @@ const baseData = {
     "options": {
         "startYear": 2018,
         "salaryCap": 150,
-        //"draftType": "BBL"
+        "numberOfPlayoffTeams": 4,
+        "playoffType": "NBA",
+        "draftType": "NBA"
     },
     "nextPlayerId": 10000,
     "seed": 1
 }
 
-let teamNames = ['Cavaliers', 'Warriors', 'Hawks', 'Timberwolves', 'Celtics', 'Rockets', 'Magic', 'Pistons', 'Knicks', 'Raptors', 'Hornets', 'Bulls'];
-teamNames = undefined;
-
-let teamMappings = {
+let bblTeamMappings = {
     'Warriors': {
         name: 'Leicester Riders'
     },
@@ -56,9 +55,8 @@ let teamMappings = {
         name: 'Sheffield Sharks'
     },    
 }
-teamMappings = {};
 
-let playerMappings = {
+let bblPlayerMappings = {
     'Kyrie Irving': {
         name: 'Tony Hicks'
     },
@@ -87,22 +85,8 @@ let playerMappings = {
         name: 'Caylin Raftopoulos'
     }
 }
-playerMappings = {};
 
 const year = 2018;
-
-let useRandomNames = false;
-
-const teams = sourceData.teams
-    .filter(team => !teamNames || teamNames.includes(team.name))
-    .map((team, i) => {
-        const id = team.tid + 1;
-        const name = `${team.region} ${team.name}`;
-        const mapping = teamMappings[team.name] || {};
-        return Object.assign({id, name}, mapping);
-    });
-    
-const teamIds = teams.map(team => team.id);
 
 function calculateGMAbility(ratings) {
     return Math.round(
@@ -278,7 +262,19 @@ function getRandomName(){
     return name;
 }
 
-const players = sourceData.players
+function generateDataFile(teamNames, teamMappings = {}, playerMappings = {}, useRandomNames = false, options = {}, outputFile){
+    const teams = sourceData.teams
+    .filter(team => !teamNames || teamNames.includes(team.name))
+    .map((team, i) => {
+        const id = team.tid + 1;
+        const name = `${team.region} ${team.name}`;
+        const mapping = teamMappings[team.name] || {};
+        return Object.assign({id, name}, mapping);
+    });
+    
+    const teamIds = teams.map(team => team.id);
+    
+    const players = sourceData.players
     .filter(player => [0].concat(teamIds).includes(player.tid+1))
     .map((player, i) => {
         const id = i;
@@ -301,7 +297,6 @@ const players = sourceData.players
         if(age >= prime || potential < ability) potential = ability;
         if(age < prime) potential = Math.min(potential, ability + ((prime-age)*5));
         if(gmAbility > 60){
-            console.log(player);
             //console.log(stamina, scoring, defense, rebounding, passing, ability, gmAbility, potential, name);
         }
         const decline = 2.5;
@@ -329,8 +324,41 @@ const players = sourceData.players
         return Object.assign(output, mapping);
     });
     
-const standings = teams.map(team => ({ teamId: team.id, played: 0, won: 0, lost: 0}));
+    const standings = teams.map(team => ({ teamId: team.id, played: 0, won: 0, lost: 0}));
+        
+    const bData = Object.assign({}, baseData, {options});
+        
+    const data = Object.assign({}, bData, { teams, players, standings });
     
-const data = Object.assign({}, baseData, { teams, players, standings });
+    fs.writeFileSync(outputFile, JSON.stringify(data));
+}
 
-fs.writeFileSync('output.json', JSON.stringify(data));
+const testTeamNames = ['Cavaliers', 'Warriors', 'Hawks', 'Timberwolves'];
+const bblTeamNames = ['Cavaliers', 'Warriors', 'Hawks', 'Timberwolves', 'Celtics', 'Rockets', 'Magic', 'Pistons', 'Knicks', 'Raptors', 'Hornets', 'Bulls'];
+const nbaTeamNames = undefined;
+
+const testOptions = {
+    startYear: 2018,
+    salaryCap: 150,
+    numberOfPlayoffTeams: 4,
+    playoffType: "NBA",
+    draftType: "NBA"
+};
+const bblOptions = {
+    startYear: 2018,
+    salaryCap: 150,
+    numberOfPlayoffTeams: 8,
+    playoffType: "BBL",
+    draftType: "BBL"
+};
+const nbaOptions = {
+    startYear: 2018,    
+    salaryCap: 150,
+    numberOfPlayoffTeams: 16,
+    playoffType: "NBA",
+    draftType: "NBA"
+};
+
+generateDataFile(testTeamNames, undefined, undefined, false, testOptions, 'test.json');
+generateDataFile(bblTeamNames, bblTeamMappings, bblPlayerMappings, false, bblOptions, 'bbl.json');
+generateDataFile(nbaTeamNames, undefined, undefined, false, nbaOptions, 'demo.json');

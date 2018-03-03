@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import * as actions from '../actions';
 import Randomizer from '../utils/Randomizer';
 import { GAME_STATE_REGULAR_SEASON, 
+    GAME_STATE_PLAYOFFS,
     GAME_STATE_END_OF_SEASON, 
     GAME_STATE_POST_SEASON, 
     GAME_STATE_FREE_AGENCY, 
@@ -21,6 +22,7 @@ export const advanceEpic = (action$, store) =>
         
         switch (stage){
             case (GAME_STATE_REGULAR_SEASON): return Observable.of(actions.playNextRound(numberOfRounds, seed));
+            case (GAME_STATE_PLAYOFFS): return Observable.of(actions.playNextRound(numberOfRounds, seed));            
             case (GAME_STATE_POST_SEASON): return Observable.concat(
                 Observable.of(actions.applyTraining(seed)),
                 Observable.of(actions.doDraft(seed))

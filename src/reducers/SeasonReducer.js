@@ -7,7 +7,8 @@ import TeamService from '../services/TeamService';
 import TeamStateModifier from './modifiers/TeamStateModifier';
 import {toast} from 'react-toastify';
 import {chain} from '../utils/utils';
-import { GAME_STATE_REGULAR_SEASON, GAME_STATE_POST_SEASON, GAME_STATE_END_OF_SEASON, 
+import ordinal from 'ordinal';
+import { GAME_STATE_REGULAR_SEASON, GAME_STATE_PLAYOFFS, GAME_STATE_POST_SEASON, GAME_STATE_END_OF_SEASON, 
     GAME_STATE_CONTRACT_NEGOTIATIONS, GAME_STATE_FREE_AGENCY, GAME_STATE_DRAFT, FREE_AGENT_TEAM_ID,
     RETIRED_TEAM_ID, UNDRAFTED_TEAM_ID } from '../constants';
 
@@ -18,6 +19,83 @@ export default class SeasonReducer{
         this.playerService = new PlayerService();
         this.teamService = new TeamService();
         this.teamStateModifier = new TeamStateModifier(this.teamService);
+    }
+    
+    endRegularSeason(action, state){
+        const stage = GAME_STATE_PLAYOFFS;        
+        const standing = state.standings.find(standing => standing.teamId === state.gameState.teamId);
+        const position = state.standings.indexOf(standing) + 1;
+        if(position > 0){
+            toast.info(`You finished ${ordinal(position)}`);
+        }
+        const gameState = Object.assign({}, state.gameState, {stage});
+        return Object.assign({}, state, {gameState});
+    }
+    
+    createNextPlayoffRound(action, state){
+        const {isFirstRound} = action;
+        
+        const {numberOfPlayoffTeams} = state.options;
+        
+        let allTeamIds;
+        
+        if(isFirstRound){
+            allTeamIds = state.standings.map(standing => standing.teamId)
+        }else{
+            const playoffRound = state.playoffs[state.playoffs.length - 1];
+            allTeamIds = playoffRound.map(fixture => fixture.winnerId);
+        }
+
+        const seededTeamIds = state.standings.filter(standing => allTeamIds.includes(standing.teamId)).map(standing => standing.teamId);
+
+        const teamIds = seededTeamIds.slice(0, numberOfPlayoffTeams);
+
+        const topTeamIds = teamIds.slice(0, teamIds.length/2);
+        
+        const firstRound = topTeamIds.map((homeId, i) => {
+            const awayId = teamIds[teamIds.length - i - 1];
+            return {id: i, homeId, awayId};
+        });
+        
+        const allRounds = [false, false, true, true, false, false, true].map(switchTeams => {
+            return firstRound.map(fixture => {
+                if(!switchTeams) return Object.assign({}, fixture);
+                return {id: fixture.id, homeId: fixture.awayId, awayId: fixture.homeId};
+            })
+        })
+        
+        const isFinal = firstRound.length === 1;
+        
+        const playoffRound = firstRound.map(fixture => {
+            return {id: fixture.id, homeId: fixture.homeId, awayId: fixture.awayId, homeWins: 0, awayWins: 0};
+        });
+        
+        const fixtures = state.fixtures.concat(allRounds);
+        
+        const playoffs = state.playoffs.concat([playoffRound]);
+        
+        firstRound.forEach(fixture => {
+            if([fixture.homeId, fixture.awayId].includes(state.gameState.teamId)){
+                const opponentId = [fixture.homeId, fixture.awayId].find(teamId => teamId !== state.gameState.teamId);
+                const opponent = state.teams.find(team => team.id === opponentId);
+                const round = isFirstRound ? 'first round' : isFinal ? 'final' : 'next round'; 
+                toast.info(`You will play ${opponent.name} in the ${round} of the playoffs`);
+            }
+        })
+        
+        return Object.assign({}, state, {fixtures, playoffs});
+    }
+    
+    endPlayoffs(action, state){
+        const stage = GAME_STATE_POST_SEASON;
+        
+        const playoffRound = state.playoffs[state.playoffs.length - 1];
+
+        const winner = state.teams.find(team => team.id === playoffRound[0].winnerId);
+        toast.info(`${winner.name} are champions`);
+        
+        const gameState = Object.assign({}, state.gameState, {stage});
+        return Object.assign({}, state, {gameState});
     }
     
     handleExpiringContracts(action, state){
@@ -248,14 +326,14 @@ export default class SeasonReducer{
         
         const gameState = Object.assign({}, state.gameState, { round, stage, year});
         
-        const fixtures = state.fixtures.map(round => {
+        const fixtures = state.fixtures.slice(0, (state.teams.length-1) * 2).map(round => {
             return round.map(fixture => Object.assign({}, fixture, {winnerId: undefined, loserId: undefined, homeScore: undefined, awayScore: undefined, homePlayerRatings: [], awayPlayerRatings: []}));
         });
         
         state = stateModifier.modifyGameState(state, { round, stage, year });
         state = stateModifier.modifyStandings(state, () => ({played: 0, won: 0, lost: 0}));
         state = stateModifier.modifyPlayers(state, player => ({ age: year - player.dob -1 }));
-        return Object.assign({}, state, {fixtures, playerRatings: []});
+        return Object.assign({}, state, {fixtures, playerRatings: [], playoffs: []});
     }
     
 }

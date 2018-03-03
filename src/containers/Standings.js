@@ -22,6 +22,14 @@ const mapStateToProps = (state, ownProps) => {
   });
   
   const players = state.players;
+  
+  const playoffs = state.playoffs.map(round => {
+      return round.map(fixture => {
+          const homeTeam = state.teams.find(team => team.id === fixture.homeId);
+          const awayTeam = state.teams.find(team => team.id === fixture.awayId);
+          return Object.assign({}, fixture, {homeTeam, awayTeam});
+      })
+  });
 
   return {
     tab,
@@ -29,7 +37,8 @@ const mapStateToProps = (state, ownProps) => {
     teamId,
     otherUserTeamIds,
     players,
-    playerRatings
+    playerRatings,
+    playoffs
   };
 };
 

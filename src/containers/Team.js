@@ -22,7 +22,7 @@ const mapStateToProps = (state, ownProps) => {
   
   const lineupRatings = teamService.getLineupRatings(lineup);
   
-  const fixtures = state.fixtures.map(round => round.find(fixture => fixture.homeId === teamId || fixture.awayId === teamId));
+  const fixtures = state.fixtures.map(round => round.find(fixture => fixture.homeId === teamId || fixture.awayId === teamId)).filter(fixture => !!fixture);
   
   const decoratedFixtures = fixtures.map(fixture => {
     const {homeId, awayId} = fixture;

@@ -18,6 +18,9 @@ export const APPLY_TRAINING = 'APPLY_TRAINING';
 export const HANDLE_EXPIRING_CONTRACTS = 'HANDLE_EXPIRING_CONTRACTS';
 export const CREATE_FREE_AGENTS = 'CREATE_FREE_AGENTS'
 export const AI_SIGN_FREE_AGENTS = 'AI_SIGN_FREE_AGENTS';
+export const END_REGULAR_SEASON = 'END_REGULAR_SEASON';
+export const CREATE_NEXT_PLAYOFF_ROUND = 'CREATE_NEXT_PLAYOFF_ROUND';
+export const END_PLAYOFFS = 'END_PLAYOFFS';
 export const END_SEASON = 'END_SEASON';
 
 export const SIGN_FREE_AGENT = 'SIGN_FREE_AGENT';
@@ -95,6 +98,15 @@ export function createFreeAgents(seed){
 }
 export function aiSignFreeAgents(seed){
     return { type: AI_SIGN_FREE_AGENTS, seed};
+}
+export function endRegularSeason(){
+    return { type: END_REGULAR_SEASON };
+}
+export function createNextPlayoffRound(isFirstRound){
+    return { type: CREATE_NEXT_PLAYOFF_ROUND, isFirstRound };
+}
+export function endPlayoffs(){
+    return { type: END_PLAYOFFS };
 }
 export function endSeason(seed){
     return { type: END_SEASON, seed };

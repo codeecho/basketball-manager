@@ -11,7 +11,7 @@ export default class GameStateBuilder{
     buildNewGameState(){
         return {
             options: {
-                
+                numberOfPlayoffTeams: 4
             },
             gameState: {
                 id: this.randomizer.getRandomString(6).toLowerCase(),
@@ -30,7 +30,8 @@ export default class GameStateBuilder{
                 users: [],
                 playersReady: []
             },
-            playerRatings: []
+            playerRatings: [],
+            playoffs:[]
         };
     }
     

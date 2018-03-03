@@ -18,10 +18,12 @@ export function getPlayerTabs(player){
     ];
 }
 
+export const PLAYOFFS_TAB_ID = 'playoffs';
 export const RATINGS_TAB_ID = 'ratings';
 
 export const standingsTabs = [
-    { id: undefined, label: 'Standings', target: `#/standings`},
+    { id: undefined, label: 'Regular Season', target: `#/standings`},
+    { id: PLAYOFFS_TAB_ID, label: 'Playoffs', target: `#/standings/${PLAYOFFS_TAB_ID}`},    
     { id: STATS_TAB_ID, label: 'Player Stats', target: `#/standings/${STATS_TAB_ID}`},
     { id: RATINGS_TAB_ID, label: 'Player Ratings', target: `#/standings/${RATINGS_TAB_ID}`}    
 ];
