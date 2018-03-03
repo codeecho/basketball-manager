@@ -328,7 +328,7 @@ export default class SeasonReducer{
         
         const gameState = Object.assign({}, state.gameState, { round, stage, year});
         
-        const fixtures = state.fixtures.filter(fixture => !fixture.playoff).map(round => {
+        const fixtures = state.fixtures.filter(round => !round[0].playoff).map(round => {
             return round.map(fixture => Object.assign({}, fixture, {winnerId: undefined, loserId: undefined, homeScore: undefined, awayScore: undefined, homePlayerRatings: [], awayPlayerRatings: []}));
         });
         
