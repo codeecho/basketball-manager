@@ -5,8 +5,8 @@ export const clientAdvanceEpic = (action$) =>
   action$
     .filter(action => action.type === actions.CLIENT_ADVANCE)
     .debounceTime(0)
-    .switchMap(({numberOfRounds, seed}) => {
-        return Observable.of(actions.advance(numberOfRounds, seed));
+    .switchMap(({numberOfRounds, playThroughPlayoffs, seed}) => {
+        return Observable.of(actions.advance(numberOfRounds, playThroughPlayoffs, seed));
     });
 
 

@@ -8,7 +8,7 @@ const surnames = require('../src/data/surnames.json');
 const baseData = {
     "options": {
         "startYear": 2018,
-        "salaryCap": 150,
+        "salaryCap": 110,
         "numberOfPlayoffTeams": 4,
         "playoffType": "NBA",
         "draftType": "NBA"
@@ -245,6 +245,7 @@ function calculateAbility(stamina, scoring, defense, rebounding, passing){
     attrs.sort((a,b) => b - a);
     //return Math.round((stamina*2 + scoring*4 + attrs[0]*2 + attrs[1]*2)/10);
     return Math.round((stamina + scoring + defense + rebounding + passing)/5);
+    //return Math.round((stamina + scoring + defense + rebounding + passing)/4);
 }
 
 function massageRating(rating){
@@ -283,21 +284,34 @@ function generateDataFile(teamNames, teamMappings = {}, playerMappings = {}, use
         const dob = player.born.year;
         const age = year - 1 - dob;
         const contractExpiry = player.contract.exp;
-        const prime = 30;
         const ratings = player.ratings[0];
         let potential = ratings.pot;
-        const stamina = ratings.endu;
-        const scoring = massageRating(calculateScoringAbility(ratings));
-        const defense = massageRating(calculateDefensiveAbility(ratings));
-        const rebounding = massageRating(calculateRebounding(ratings));
-        const passing = massageRating(calculatePassing(ratings));
+        const stamina = age < 30 ? 75 + Math.round((Math.random() * 20)) : ratings.endu;
+        let scoring = massageRating(calculateScoringAbility(ratings));
+        let defense = massageRating(calculateDefensiveAbility(ratings));
+        let rebounding = massageRating(calculateRebounding(ratings));
+        let passing = massageRating(calculatePassing(ratings));
         const gmAbility = calculateGMAbility(ratings);
-        const ability = calculateAbility(stamina, scoring, defense, rebounding, passing);
+        let ability = calculateAbility(stamina, scoring, defense, rebounding, passing);
+        const delta = gmAbility/ability;
+        scoring = Math.round(scoring * delta);
+        defense = Math.round(defense * delta);
+        rebounding = Math.round(rebounding * delta);
+        passing = Math.round(passing * delta);        
+        ability = calculateAbility(stamina, scoring, defense, rebounding, passing);       
         potential = potential + (ability - gmAbility);
+        if(age > 30 && potential > ability) ability = potential;
+        if(potential < ability) potential = ability;
+        let prime = 28;
+        if(age > 26 && age < 30 && potential > ability){
+            const diff = potential - ability;
+            prime = 28 + Math.round(diff/5);
+        }
         if(age >= prime || potential < ability) potential = ability;
         if(age < prime) potential = Math.min(potential, ability + ((prime-age)*5));
-        if(gmAbility > 60){
-            //console.log(stamina, scoring, defense, rebounding, passing, ability, gmAbility, potential, name);
+        if(ability > 60){
+            //console.log(age, stamina, scoring, defense, rebounding, passing, ability, gmAbility, potential, ratings.pot, name);
+            //console.log(age, prime, ability, potential, gmAbility, ratings.pot, player.name);
         }
         const decline = 2.5;
         const draftYear = player.draft.year || 1970;
@@ -333,7 +347,7 @@ function generateDataFile(teamNames, teamMappings = {}, playerMappings = {}, use
     fs.writeFileSync(outputFile, JSON.stringify(data));
 }
 
-const testTeamNames = ['Cavaliers', 'Warriors', 'Hawks', 'Timberwolves'];
+const testTeamNames = ['Cavaliers', 'Warriors', 'Thunder', 'Timberwolves', '76ers'];
 const bblTeamNames = ['Cavaliers', 'Warriors', 'Hawks', 'Timberwolves', 'Celtics', 'Rockets', 'Magic', 'Pistons', 'Knicks', 'Raptors', 'Hornets', 'Bulls'];
 const nbaTeamNames = undefined;
 
@@ -347,7 +361,7 @@ const testOptions = {
 };
 const bblOptions = {
     startYear: 2018,
-    salaryCap: 150,
+    salaryCap: 110,
     numberOfPlayoffTeams: 8,
     fixturesType: "BBL",    
     playoffType: "BBL",
@@ -355,7 +369,7 @@ const bblOptions = {
 };
 const nbaOptions = {
     startYear: 2018,    
-    salaryCap: 150,
+    salaryCap: 110,
     numberOfPlayoffTeams: 16,
     fixturesType: "NBA",
     playoffType: "NBA",

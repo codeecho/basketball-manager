@@ -40,11 +40,11 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-      advance: (isOnlineGame, numberOfRounds) => {
+      advance: (isOnlineGame, numberOfRounds, playThroughPlayoffs) => {
           if(isOnlineGame){
-            dispatch(serverPlayerReady(numberOfRounds));
+            dispatch(serverPlayerReady(numberOfRounds, playThroughPlayoffs));
           }else{
-            dispatch(advance(numberOfRounds));
+            dispatch(advance(numberOfRounds, playThroughPlayoffs));
           }
       },
       hostOnlineGame: () => dispatch(hostOnlineGame()),

@@ -8,7 +8,7 @@ import CheckBox from './CheckBox';
 import {GAME_STATE_CONTRACT_NEGOTIATIONS} from '../constants';
 
 export default function PlayerTable(props){
-    const {players, onSelect, year, stage} = props;
+    const {players, onSelect, year, stage, defaultSortProperty = 'ability'} = props;
     let headings = onSelect ? [{label: ''}] : []
     headings = headings.concat([
         {label: 'Name'},
@@ -25,7 +25,7 @@ export default function PlayerTable(props){
     return (
         <div className="scrolling-table">
             <div className="scrolling-table-inner">
-                <SortableTable limit={props.limit} defaultSortProperty="ability" data={players} headings={headings} renderRow={(player => <PlayerRow player={player} {...props} />)} />
+                <SortableTable limit={props.limit} defaultSortProperty={defaultSortProperty} data={players} headings={headings} renderRow={(player => <PlayerRow player={player} {...props} />)} />
             </div>
         </div>
     )

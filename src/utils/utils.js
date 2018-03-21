@@ -5,6 +5,14 @@ export function chain(value){
     }
 }
 
+export function numberArray(length){
+    const arr = [];
+    for(let i=0; i<length; i++){
+        arr.push(i);
+    }
+    return arr;
+}
+
 
 // WEBPACK FOOTER //
 // src/utils/utils.js

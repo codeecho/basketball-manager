@@ -15,14 +15,14 @@ export const advanceEpic = (action$, store) =>
   action$
     .filter(action => action.type === actions.ADVANCE)
     .debounceTime(0)
-    .switchMap(({numberOfRounds, seed}) => {
+    .switchMap(({numberOfRounds, playThroughPlayoffs, seed}) => {
         const state = store.getState();
         
         const stage = state.gameState.stage
         
         switch (stage){
-            case (GAME_STATE_REGULAR_SEASON): return Observable.of(actions.playNextRound(numberOfRounds, seed));
-            case (GAME_STATE_PLAYOFFS): return Observable.of(actions.playNextRound(numberOfRounds, seed));            
+            case (GAME_STATE_REGULAR_SEASON): return Observable.of(actions.playNextRound(numberOfRounds, playThroughPlayoffs, seed));
+            case (GAME_STATE_PLAYOFFS): return Observable.of(actions.playNextRound(numberOfRounds, playThroughPlayoffs, seed));            
             case (GAME_STATE_POST_SEASON): return Observable.concat(
                 Observable.of(actions.applyTraining(seed)),
                 Observable.of(actions.doDraft(seed))

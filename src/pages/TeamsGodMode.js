@@ -38,13 +38,16 @@ export default class TeamsGodMode extends Component{
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Payroll</th>
                             <th onClick={() => this.sort('scoring')}>Scoring</th>
                             <th onClick={() => this.sort('defense')}>Defense</th>
                             <th onClick={() => this.sort('rebounding')}>Rebounding</th>
                             <th onClick={() => this.sort('passing')}>Passing</th>
                             <th onClick={() => this.sort('offensiveRating')}>Offensive Rating</th>
                             <th onClick={() => this.sort('defensiveRating')}>Defensive Rating</th>
-                            <th onClick={() => this.sort('overall')}>Overall</th>                        
+                            <th onClick={() => this.sort('overall')}>Overall</th>   
+                            <th>Rating</th>
+                            <th>Strategy</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -60,18 +63,21 @@ export default class TeamsGodMode extends Component{
 
 function TeamRow(props){
     const {team} = props;
-    const {name, ratings} = team;
+    const {name, payroll, ratings, rating, strategy} = team;
     const {scoring, defense, rebounding, passing, offensiveRating, defensiveRating, overall} = ratings;
     return (
         <tr>
             <th><TeamLink team={team} /></th>
+            <td>{payroll}</td>
             <td>{scoring}</td>
             <td>{defense}</td>
             <td>{rebounding}</td>
             <td>{passing}</td>
             <td>{offensiveRating}</td>
             <td>{defensiveRating}</td>
-            <td>{overall}</td>            
+            <td>{overall}</td> 
+            <td>{rating}</td>
+            <td>{strategy}</td>            
         </tr>
     )
 }

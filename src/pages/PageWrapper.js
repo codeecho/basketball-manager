@@ -23,11 +23,17 @@ export default function PageWrapper(props){
                   </Navbar.Brand>
                 {props.teamId &&
                     <Nav pullRight>
-                      {([GAME_STATE_REGULAR_SEASON, GAME_STATE_PLAYOFFS].includes(stage) && (!isOnlineGame || isHost)) && <NavDropdown eventKey={1} title="Continue" disabled={!canAdvance}>
-                        <MenuItem eventKey={1.1} onClick={() => props.advance(isOnlineGame, 1)}>Play Next Round</MenuItem>
-                        <MenuItem eventKey={1.2} onClick={() => props.advance(isOnlineGame, 5)}>Play Next 5 Rounds</MenuItem>
-                        <MenuItem eventKey={1.3} onClick={() => props.advance(isOnlineGame, 10)}>Play Next 10 Rounds</MenuItem>
-                        <MenuItem eventKey={1.3} onClick={() => props.advance(isOnlineGame, 99)}>Play Full Season</MenuItem>                        
+                      {([GAME_STATE_REGULAR_SEASON].includes(stage) && (!isOnlineGame || isHost)) && <NavDropdown eventKey={1} title="Continue" disabled={!canAdvance}>
+                        <MenuItem eventKey={1.1} onClick={() => props.advance(isOnlineGame, 1)}>Play Next Fixture</MenuItem>
+                        <MenuItem eventKey={1.2} onClick={() => props.advance(isOnlineGame, 5)}>Play Next 5 Fixtures</MenuItem>
+                        <MenuItem eventKey={1.3} onClick={() => props.advance(isOnlineGame, 10)}>Play Next 10 Fixtures</MenuItem>
+                        <MenuItem eventKey={1.4} onClick={() => props.advance(isOnlineGame, 99)}>Play Regular Season</MenuItem>                        
+                        <MenuItem eventKey={1.5} onClick={() => props.advance(isOnlineGame, 99, true)}>Play Full Season</MenuItem>                                                
+                    </NavDropdown>}
+                    {([GAME_STATE_PLAYOFFS].includes(stage) && (!isOnlineGame || isHost)) && <NavDropdown eventKey={1} title="Continue" disabled={!canAdvance}>
+                        <MenuItem eventKey={1.1} onClick={() => props.advance(isOnlineGame, 1)}>Play Next Fixture</MenuItem>
+                        <MenuItem eventKey={1.2} onClick={() => props.advance(isOnlineGame, 99)}>Play This Round</MenuItem>
+                        <MenuItem eventKey={1.3} onClick={() => props.advance(isOnlineGame, 99, true)}>Play Through Playoffs</MenuItem>                        
                     </NavDropdown>}
                     {(![GAME_STATE_REGULAR_SEASON, GAME_STATE_PLAYOFFS].includes(stage) || (isOnlineGame && !isHost)) && <NavItem onClick={() => props.advance(isOnlineGame, 1)} disabled={!canAdvance}>Continue</NavItem>                  }
                                         </Nav>}
@@ -44,7 +50,7 @@ export default function PageWrapper(props){
                     <NavItem href="#/standings" title="Standings"><Glyphicon glyph="list"/></NavItem>
                     <NavItem href="#/freeAgents" title="Free Agents"><Glyphicon glyph="pencil"/></NavItem>
                     {teamId > 0 && <NavItem onClick={props.trade} title="Trade"><Glyphicon glyph="transfer"/></NavItem>}                  
-                    {!draftType && <NavItem href="#/draft" title="Draft"><Glyphicon glyph="list-alt"/></NavItem>}
+                    {draftType !== 'BBL' && <NavItem href="#/draft" title="Draft"><Glyphicon glyph="list-alt"/></NavItem>}
                     <NavItem href="#/settings" title="Settings"><Glyphicon glyph="cog"/></NavItem>                    
                   </Nav>}
             </Navbar>

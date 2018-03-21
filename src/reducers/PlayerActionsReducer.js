@@ -88,11 +88,30 @@ export default class PlayerActionsReducer{
             }
         });
         
+        let tradedPicks = state.tradedPicks
+            .filter(pick => !requested.picks.concat(offered.picks).find(x => x.year === pick.year && x.round === pick.round && x.teamId === pick.teamId))
+            .concat(requested.picks.map(pick => {
+                return {
+                    year: pick.year,
+                    round: pick.round,
+                    teamId: pick.teamId,
+                    ownerId: fromTeamId
+                };
+            }))
+            .concat(offered.picks.map(pick => {
+                return {
+                    year: pick.year,
+                    round: pick.round,
+                    teamId: pick.teamId,
+                    ownerId: toTeamId
+                };
+            }))            
+        
         if(fromTeamId === state.gameState.teamId){
             window.location = `#/team/${fromTeamId}`;
         }
         
-        return chain(Object.assign({}, state, {players}))
+        return chain(Object.assign({}, state, {players, tradedPicks}))
             .then(state => this.teamStateModifier.modifyPayroll(state, [fromTeamId, toTeamId]))
             .result;
     }

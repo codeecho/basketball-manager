@@ -32,6 +32,12 @@ const mapStateToProps = (state, ownProps) => {
           return Object.assign({}, fixture, {homeTeam, awayTeam});
       })
   });
+  
+  const champions = state.champions.map(champion => {
+      const team = state.teams.find(team => team.id === champion.teamId);
+      return Object.assign({}, champion, {team});
+  });
+  champions.sort((a,b) => b.year - a.year);
 
   return {
     tab,
@@ -41,7 +47,8 @@ const mapStateToProps = (state, ownProps) => {
     players,
     playerRatings,
     playoffs,
-    playoffType
+    playoffType,
+    champions
   };
 };
 

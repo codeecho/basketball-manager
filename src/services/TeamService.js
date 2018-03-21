@@ -1,4 +1,12 @@
+import PlayerService from './PlayerService';
+
+import {numberArray} from '../utils/utils';
+
 export default class TeamService{
+    
+    constructor(){
+        this.playerService = new PlayerService();
+    }
     
     calculatePayroll(players){
         let payroll = 0;
@@ -82,7 +90,50 @@ export default class TeamService{
     getSquadRatings(players){
         const lineup = this.getLineup(players);
         return this.getLineupRatings(lineup);
-    }    
+    }
+    
+    getProjectedSquadRating(players, years){
+        const projectedPlayers = players.map(player => {
+            return this.playerService.applyProjectedTraining(player, years);
+        });
+        return this.getSquadRating(projectedPlayers);
+    }
+    
+    getDraftPicks(teamId, fromYear, numberOfYears, allTradedPicks){
+        const tradedPicks = allTradedPicks.filter(draftPick => draftPick.teamId === teamId);
+  
+        const acquiredPicks = allTradedPicks
+            .filter(draftPick => draftPick.ownerId === teamId)
+            .map(draftPick => {
+                return Object.assign({}, draftPick, {acquired: true});
+            });
+      
+        const draftPicks = acquiredPicks;
+      
+        numberArray(numberOfYears).forEach(i => {
+            const draftYear = fromYear + i;
+            if(!tradedPicks.find(pick => pick.year === draftYear && pick.round === 1)){
+                draftPicks.push({
+                    year: draftYear,
+                    round: 1,
+                    teamId: teamId,
+                    ownerId: teamId
+                });   
+            }
+            if(!tradedPicks.find(pick => pick.year === draftYear && pick.round === 2)){
+                draftPicks.push({
+                    year: draftYear,
+                    round: 2,
+                    teamId: teamId,
+                    ownerId: teamId                    
+                });   
+            }
+        });
+            
+        draftPicks.sort((a, b) => a.year - b.year);
+        
+        return draftPicks;
+    }
     
 }
 

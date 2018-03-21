@@ -10,7 +10,8 @@ import {chain} from '../utils/utils';
 import ordinal from 'ordinal';
 import { GAME_STATE_REGULAR_SEASON, GAME_STATE_PLAYOFFS, GAME_STATE_POST_SEASON, GAME_STATE_END_OF_SEASON, 
     GAME_STATE_CONTRACT_NEGOTIATIONS, GAME_STATE_FREE_AGENCY, GAME_STATE_DRAFT, FREE_AGENT_TEAM_ID,
-    RETIRED_TEAM_ID, UNDRAFTED_TEAM_ID } from '../constants';
+    RETIRED_TEAM_ID, UNDRAFTED_TEAM_ID, STRATEGY_TITLE_CONTENDERS, STRATEGY_PLAYOFF_CONTENDERS, STRATEGY_REBUILDING,
+    STRATEGY_TITLE_HOPEFULS, STRATEGY_PLAYOFF_HOPEFULS, STRATEGY_TANKING} from '../constants';
 
 export default class SeasonReducer{
     
@@ -95,9 +96,10 @@ export default class SeasonReducer{
 
         const winner = state.teams.find(team => team.id === playoffRound[0].winnerId);
         toast.info(`${winner.name} are champions`);
+        const champions = state.champions.concat({year: state.gameState.year, teamId: winner.id});
         
         const gameState = Object.assign({}, state.gameState, {stage});
-        return Object.assign({}, state, {gameState});
+        return Object.assign({}, state, {gameState, champions});
     }
     
     handleExpiringContracts(action, state){
@@ -136,20 +138,9 @@ export default class SeasonReducer{
         const {seed} = action;
         const randomizer = new Randomizer(seed);
         return stateModifier.modifyPlayers(state, player => {
-            if(player.teamId === UNDRAFTED_TEAM_ID) return;
-            if(player.teamId === FREE_AGENT_TEAM_ID) return;
-            const originalAbility = player.ability;
-            const realDelta = this.playerService.calculateTrainingAdjustment(player);
-            const realAbility = player.realAbility + realDelta;
-            const ability = Math.floor(realAbility);
-            const delta = ability - originalAbility;
-            const attrDeltas = getAttributeDeltas(randomizer, delta);
-            const scoring = player.scoring + attrDeltas[0];
-            const defense = player.defense + attrDeltas[1];
-            const rebounding = player.rebounding + attrDeltas[2];
-            const passing = player.passing + attrDeltas[3];            
-            const expectedSalary = this.playerService.calculateExpectedSalary(Object.assign({}, player, {delta, ability, realAbility, scoring, defense, rebounding, passing}));
-            return { delta, ability, realAbility, expectedSalary, scoring, defense, rebounding, passing };
+            const updatedPlayer = this.playerService.applyTraining(player);
+            const expectedSalary = this.playerService.calculateExpectedSalary(updatedPlayer);
+            return Object.assign({}, updatedPlayer, {expectedSalary});
         });
     }
     
@@ -173,27 +164,37 @@ export default class SeasonReducer{
         }
         
         const {year, teamId} = state.gameState;
+        
         let draft = state.players.filter(player => player.draftYear === year);
         draft.sort((a, b) => b.potential - a.potential);
+        
         let players = state.players.concat();
+        
         const standings = state.standings.concat();
         standings.sort((a, b) => a.won - b.won);
+        
         standings.forEach((standing, i) => {
             const player = draft[i];
-            player.teamId = standing.teamId;
+            const tradedPick = state.tradedPicks.find(pick => pick.year === year && pick.round === 1 && pick.teamId === standing.teamId);
+            player.teamId = tradedPick ? tradedPick.ownerId : standing.teamId;
             player.contractExpiry = year+3;
-            if(player.teamId === teamId) toast.info(`You drafted ${player.name} in the 1st round of the draft`);
+            if(player.teamId === teamId) toast.info(`You drafted ${player.name} with the ${ordinal(i+1)} pick in the 1st round of the draft`);
         });
+        
         draft = draft.slice(standings.length);
+        
         standings.forEach((standing, i) => {
             const player = draft[i];
-            player.teamId = standing.teamId;
+            const tradedPick = state.tradedPicks.find(pick => pick.year === year && pick.round === 2 && pick.teamId === standing.teamId);
+            player.teamId = tradedPick ? tradedPick.ownerId : standing.teamId;
             player.contractExpiry = year+3;
-            if(player.teamId === teamId) toast.info(`You drafted ${player.name} in the 2nd round of the draft`);
+            if(player.teamId === teamId) toast.info(`You drafted ${player.name} with the ${ordinal(i+1)} pick in the 2nd round of the draft`);
         });
+        
         draft = draftService.createDraftClass(state.gameState.year+1, state.nextPlayerId, state.teams.length*2);
         const nextPlayerId = state.nextPlayerId + draft.length;
         players = players.concat(draft);
+        
         const stage = GAME_STATE_DRAFT;
         const gameState = Object.assign({}, state.gameState, {stage});
         
@@ -214,7 +215,7 @@ export default class SeasonReducer{
         const players = state.players.concat();
         
         state.teams.forEach(team => {
-            const isUserTeam = team.id == teamId;
+            const isUserTeam = team.id === teamId;
             
             const isOtherUserTeam = state.onlineGame.users.find(user => user.teamId === team.id);
             
@@ -250,7 +251,7 @@ export default class SeasonReducer{
                 
                 const {expectedSalary} = player;
                 
-                const resignPossibility = lineup.starters.includes(player) ? 0.8 : lineup.secondUnit.includes(player) ? 0.6 : 0
+                const resignPossibility = lineup.starters.includes(player) ? 0.8 : lineup.secondUnit.includes(player) ? 0.6 : 0;
                 
                 const shouldResign = expectedSalary < capSpace && randomizer.getRandomBoolean(resignPossibility);
                 
@@ -332,31 +333,36 @@ export default class SeasonReducer{
             return round.map(fixture => Object.assign({}, fixture, {winnerId: undefined, loserId: undefined, homeScore: undefined, awayScore: undefined, homePlayerRatings: [], awayPlayerRatings: []}));
         });
         
+        const teams = state.teams.map(team => {
+            const players = state.players.filter(player => player.teamId === team.id);
+            const rating = this.teamService.getSquadRating(players);
+            return Object.assign({}, team, {rating});
+        });
+        
+        teams.sort((a,b) => b.rating - a.rating);
+        
+        teams.forEach((team, i) => {
+            team.ranking = i+1;
+            const n = Math.max(teams.length / 6, 1);
+            if(i < n){
+                team.strategy = STRATEGY_TITLE_CONTENDERS;
+            }else if(i < 2*n){
+                team.strategy = STRATEGY_TITLE_HOPEFULS;                
+            }else if(i < 3*n){
+                team.strategy = STRATEGY_PLAYOFF_CONTENDERS;                
+            }else if(i < 4*n){
+                team.strategy = STRATEGY_PLAYOFF_HOPEFULS;                
+            }else if(i < 5*n){
+                team.strategy = STRATEGY_REBUILDING;                
+            }else{
+                team.strategy = STRATEGY_TANKING;                
+            }
+        });
+        
         state = stateModifier.modifyGameState(state, { round, stage, year });
         state = stateModifier.modifyStandings(state, () => ({played: 0, won: 0, lost: 0}));
         state = stateModifier.modifyPlayers(state, player => ({ age: year - player.dob -1 }));
-        return Object.assign({}, state, {fixtures, playerRatings: [], playoffs: []});
+        return Object.assign({}, state, {teams, fixtures, playerRatings: [], playoffs: []});
     }
     
 }
-
-function getAttributeDeltas(randomizer, delta){
-    if(delta <= 0) return [delta, delta, delta, delta];
-    const total = delta * 4;
-    const deltas = [];
-    const lowerBand = Math.max(delta-3, 0);
-    const upperBand = delta+3;
-    let allocated = 0;
-    for(let i=0; i< 3; i++){
-        let n = randomizer.getRandomInteger(lowerBand, upperBand);
-        n = Math.min(n, total-allocated);
-        allocated += n;
-        deltas.push(n);
-    }
-    deltas.push(total-allocated);
-    return deltas;
-}
-
-
-// WEBPACK FOOTER //
-// src/reducers/SeasonReducer.js

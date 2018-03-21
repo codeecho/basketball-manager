@@ -10,6 +10,8 @@ import FixtureListGenerator from '../services/FixtureListGenerator';
 
 import {chain} from '../utils/utils';
 
+import {STRATEGY_TITLE_CONTENDERS, STRATEGY_TITLE_HOPEFULS, STRATEGY_PLAYOFF_CONTENDERS, STRATEGY_PLAYOFF_HOPEFULS, STRATEGY_REBUILDING, STRATEGY_TANKING} from '../constants';
+
 export default class GameSetupReducer{
     
     constructor(){
@@ -52,9 +54,35 @@ export default class GameSetupReducer{
                     awayId: fixture.away.id
                 };
             });
+        });
+        
+        const teams = data.teams.map(team => {
+           const players = data.players.filter(player => player.teamId === team.id);
+           const rating = teamService.getSquadRating(players);
+           return Object.assign({}, team, {rating});
+        });
+        
+        teams.sort((a,b) => b.rating - a.rating);
+        
+        teams.forEach((team, i) => {
+            team.ranking = i+1;
+            const n = Math.max(teams.length / 6, 1);
+            if(i < n){
+                team.strategy = STRATEGY_TITLE_CONTENDERS;
+            }else if(i < 2*n){
+                team.strategy = STRATEGY_TITLE_HOPEFULS;                
+            }else if(i < 3*n){
+                team.strategy = STRATEGY_PLAYOFF_CONTENDERS;                
+            }else if(i < 4*n){
+                team.strategy = STRATEGY_PLAYOFF_HOPEFULS;                
+            }else if(i < 5*n){
+                team.strategy = STRATEGY_REBUILDING;                
+            }else{
+                team.strategy = STRATEGY_TANKING;                
+            }
         })
         
-        let newState = Object.assign({}, state, data, { players, nextPlayerId, fixtures });
+        let newState = Object.assign({}, state, data, { teams, players, nextPlayerId, fixtures });
     
         newState.gameState.year = year;
         

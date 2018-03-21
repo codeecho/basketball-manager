@@ -9,7 +9,10 @@ import PageWrapper from '../containers/PageWrapper';
 import PlayerTable from '../components/PlayerTable';
 import TeamSelect from '../components/TeamSelect';
 import PlayerSelect from '../components/PlayerSelect';
+import DraftPickTable from '../containers/DraftPickTable';
+import DraftPickSelect from '../components/DraftPickSelect';
 
+import TeamService from '../services/TeamService';
 import TradeService from '../services/TradeService';
 
 import modal from '../utils/modal';
@@ -24,36 +27,58 @@ export default class TradingNegotiations extends Component{
     constructor(props){
         super(props);
         
-        const {teams, players, proposal} = props;
+        const {teams, players, proposal, year, tradedPicks} = props;
+        
+        this.teamService = new TeamService();
+        this.tradeService = new TradeService(teams, players);
         
         const selectedUserPlayers = proposal ? proposal.requested.players : [];
         const unselectedUserPlayers = proposal ? props.userPlayers.filter(player => !proposal.requested.players.includes(player)) : props.userPlayers;
+        
+        const selectedUserDraftPicks = proposal ? proposal.requested.picks : [];
+        const unselectedUserDraftPicks = proposal ? props.userDraftPicks.filter(pick => !proposal.requested.picks.includes(pick)) : props.userDraftPicks;
         
         const selectedCPUTeam = proposal ? proposal.team: teams[0];
         
         const selectedCPUPlayers = proposal ? proposal.offered.players : [];
         const unselectedCPUPlayers = players.filter(player => player.teamId === selectedCPUTeam.id && (!proposal || !proposal.offered.players.includes(player)));
+
+        const cpuDraftPicks = this.teamService.getDraftPicks(selectedCPUTeam.id, year, 4, tradedPicks);
+        const selectedCPUDraftPicks = proposal ? proposal.offered.picks : [];
+        const unselectedCPUDraftPicks = proposal ? cpuDraftPicks.filter(pick => !proposal.offered.picks.includes(pick)) : cpuDraftPicks;
         
         this.state = {
             selectedCPUTeam: selectedCPUTeam,
             unselectedUserPlayers,
             selectedUserPlayers,
+            unselectedUserDraftPicks,
+            selectedUserDraftPicks,
             unselectedCPUPlayers,
             selectedCPUPlayers,
+            unselectedCPUDraftPicks,
+            selectedCPUDraftPicks,
             salaryOut: 0,
             salaryIn: 0
-        }
-        
-        this.tradeService = new TradeService(teams, players);
+        };
         
         this.selectTeam = this.selectTeam.bind(this);
+        
         this.selectUserPlayer = this.selectUserPlayer.bind(this);
         this.deselectUserPlayer = this.deselectUserPlayer.bind(this);
+        
+        this.selectUserDraftPick = this.selectUserDraftPick.bind(this);
+        this.deselectUserDraftPick = this.deselectUserDraftPick.bind(this);        
+        
         this.selectCPUPlayer = this.selectCPUPlayer.bind(this);
         this.deselectCPUPlayer = this.deselectCPUPlayer.bind(this);    
         
+        this.selectCPUDraftPick = this.selectCPUDraftPick.bind(this);
+        this.deselectCPUDraftPick = this.deselectCPUDraftPick.bind(this);                
+        
         this.showUserPlayerSelectModal = this.showUserPlayerSelectModal.bind(this);
+        this.showUserDraftPicksSelectModal = this.showUserDraftPicksSelectModal.bind(this);        
         this.showCPUPlayerSelectModal = this.showCPUPlayerSelectModal.bind(this);
+        this.showCPUDraftPicksSelectModal = this.showCPUDraftPicksSelectModal.bind(this);         
         
         this.proposeTrade = this.proposeTrade.bind(this);
     }
@@ -65,10 +90,13 @@ export default class TradingNegotiations extends Component{
     selectTeam(teamId){
         const team = this.props.teams.find(team => team.id === teamId);
         const unselectedCPUPlayers = this.props.players.filter(player => player.teamId === teamId);
+        const unselectedCPUDraftPicks = this.teamService.getDraftPicks(teamId, this.props.year, 4, this.props.tradedPicks);
         this.setState({
             selectedCPUTeam: team,
             unselectedCPUPlayers,
-            selectedCPUPlayers: []
+            selectedCPUPlayers: [],
+            selectedCPUDraftPicks: [],
+            unselectedCPUDraftPicks
         }, () => this.calculateSalaryTotals());
     }
     
@@ -90,6 +118,24 @@ export default class TradingNegotiations extends Component{
         }, () => this.calculateSalaryTotals());
     }
     
+    selectUserDraftPick(selectedDraftPick){
+        const unselectedUserDraftPicks = this.state.unselectedUserDraftPicks.filter(pick => !(pick.year === selectedDraftPick.year && pick.round === selectedDraftPick.round && pick.teamId === selectedDraftPick.teamId));
+        const selectedUserDraftPicks = this.state.selectedUserDraftPicks.filter(pick => !(pick.year === selectedDraftPick.year && pick.round === selectedDraftPick.round && pick.teamId === selectedDraftPick.teamId)).concat(selectedDraftPick);
+        this.setState({
+            unselectedUserDraftPicks,
+            selectedUserDraftPicks
+        }, () => this.assessTrade());
+    }
+    
+    deselectUserDraftPick(selectedDraftPick){
+        const selectedUserDraftPicks = this.state.selectedUserDraftPicks.filter(pick => !(pick.year === selectedDraftPick.year && pick.round === selectedDraftPick.round && pick.teamId === selectedDraftPick.teamId));
+        const unselectedUserDraftPicks = this.state.unselectedUserDraftPicks.filter(pick => !(pick.year === selectedDraftPick.year && pick.round === selectedDraftPick.round && pick.teamId === selectedDraftPick.teamId)).concat(selectedDraftPick);
+        this.setState({
+            unselectedUserDraftPicks,
+            selectedUserDraftPicks
+        }, () => this.assessTrade());
+    }
+    
     selectCPUPlayer(selectedPlayer){
         const unselectedCPUPlayers = this.state.unselectedCPUPlayers.filter(player => player !== selectedPlayer);
         const selectedCPUPlayers = this.state.selectedCPUPlayers.filter(player => player !== selectedPlayer).concat(selectedPlayer);
@@ -108,6 +154,24 @@ export default class TradingNegotiations extends Component{
         }, () => this.calculateSalaryTotals());
     }
     
+    selectCPUDraftPick(selectedDraftPick){
+        const unselectedCPUDraftPicks = this.state.unselectedCPUDraftPicks.filter(pick => !(pick.year === selectedDraftPick.year && pick.round === selectedDraftPick.round && pick.teamId === selectedDraftPick.teamId));
+        const selectedCPUDraftPicks = this.state.selectedCPUDraftPicks.filter(pick => !(pick.year === selectedDraftPick.year && pick.round === selectedDraftPick.round && pick.teamId === selectedDraftPick.teamId)).concat(selectedDraftPick);
+        this.setState({
+            unselectedCPUDraftPicks,
+            selectedCPUDraftPicks
+        }, () => this.assessTrade());
+    }
+    
+    deselectCPUDraftPick(selectedDraftPick){
+        const selectedCPUDraftPicks = this.state.selectedCPUDraftPicks.filter(pick => !(pick.year === selectedDraftPick.year && pick.round === selectedDraftPick.round && pick.teamId === selectedDraftPick.teamId));
+        const unselectedCPUDraftPicks = this.state.unselectedCPUDraftPicks.filter(pick => !(pick.year === selectedDraftPick.year && pick.round === selectedDraftPick.round && pick.teamId === selectedDraftPick.teamId)).concat(selectedDraftPick);
+        this.setState({
+            unselectedCPUDraftPicks,
+            selectedCPUDraftPicks
+        }, () => this.assessTrade());
+    }
+    
     calculateSalaryTotals(){
         const {selectedUserPlayers, selectedCPUPlayers} = this.state;
         const salaryOut = selectedUserPlayers.reduce((total, player) => total + player.salary, 0);
@@ -124,21 +188,36 @@ export default class TradingNegotiations extends Component{
         });
     }
     
+    showUserDraftPicksSelectModal(){
+        modal.show({
+            body: <DraftPickSelect draftPicks={this.state.unselectedUserDraftPicks} onSelect={this.selectUserDraftPick} />
+        });
+    }
+    
     showCPUPlayerSelectModal(){
         modal.show({
             body: <PlayerSelect players={this.state.unselectedCPUPlayers} selectPlayer={this.selectCPUPlayer} />
         });
     }
     
+    showCPUDraftPicksSelectModal(){
+        modal.show({
+            body: <DraftPickSelect draftPicks={this.state.unselectedCPUDraftPicks} onSelect={this.selectCPUDraftPick} />
+        });
+    }
+    
     assessTrade(){
         const proposedTrade = {
+            year: this.props.year,
             offered: {
-                players: this.state.selectedUserPlayers
+                players: this.state.selectedUserPlayers,
+                picks: this.state.selectedUserDraftPicks
             },
             toTeam: this.state.selectedCPUTeam,
             fromTeam: this.props.userTeam,
             requested: {
-                players: this.state.selectedCPUPlayers
+                players: this.state.selectedCPUPlayers,
+                picks: this.state.selectedCPUDraftPicks                
             }
         };
         
@@ -149,13 +228,16 @@ export default class TradingNegotiations extends Component{
     
     proposeTrade(){
         const proposedTrade = {
+            year: this.props.year,
             offered: {
-                players: this.state.selectedUserPlayers
+                players: this.state.selectedUserPlayers,
+                picks: this.state.selectedUserDraftPicks                
             },
             toTeam: this.state.selectedCPUTeam,
             fromTeam: this.props.userTeam,
             requested: {
-                players: this.state.selectedCPUPlayers
+                players: this.state.selectedCPUPlayers,
+                picks: this.state.selectedCPUDraftPicks  
             }
         };
         
@@ -169,12 +251,14 @@ export default class TradingNegotiations extends Component{
                 onConfirm: () => {
                     const trade = {
                         offered: {
-                            playerIds: this.state.selectedUserPlayers.map(player => player.id)
+                            playerIds: this.state.selectedUserPlayers.map(player => player.id),
+                            picks: this.state.selectedUserDraftPicks
                         },
                         toTeamId: this.state.selectedCPUTeam.id,
                         fromTeamId: this.props.userTeam.id,
                         requested: {
-                            playerIds: this.state.selectedCPUPlayers.map(player => player.id)
+                            playerIds: this.state.selectedCPUPlayers.map(player => player.id),
+                            picks: this.state.selectedCPUDraftPicks                            
                         }
                     };
                     this.props.completeTrade(trade);
@@ -184,30 +268,38 @@ export default class TradingNegotiations extends Component{
     }
     
     render(){
-        const {userPlayers, teams, salaryCap, userTeam} = this.props;
-        const {selectedCPUTeam, salaryOut, salaryIn, fromTeamRatings, toTeamRatings} = this.state;
+        const {userPlayers, teams, salaryCap, userTeam, canTrade} = this.props;
+        
+        const {selectedCPUTeam, salaryOut, salaryIn, fromTeamRatings, toTeamRatings, selectedUserPlayers, selectedUserDraftPicks, selectedCPUPlayers, selectedCPUDraftPicks} = this.state;
         
         const userPayrollAfterTrade = userTeam.payroll - salaryOut + salaryIn;
         const cpuPayrollAfterTrade = selectedCPUTeam.payroll + salaryOut - salaryIn
     
-        const tradeAllowed = userPayrollAfterTrade <= salaryCap && cpuPayrollAfterTrade <= salaryCap;    
+        const tradeAllowed = selectedUserPlayers.concat(selectedUserDraftPicks).length > 0 && selectedCPUPlayers.concat(selectedCPUDraftPicks).length > 0 && userPayrollAfterTrade <= salaryCap && cpuPayrollAfterTrade <= salaryCap;    
         
         return (
             <PageWrapper id="trade-page" title="Trading Block" tabs={tradeTabs} selectedTab={TRADE_TAB_ID}>
-                <Row>
+                {!canTrade && <div>The trade deadline has passed</div>}
+                {canTrade && <Row>
                     <Col md={6}>
                         <h5>&nbsp;</h5>
-                        <PlayerTable players={this.state.selectedUserPlayers} onSelect={this.deselectUserPlayer} selectButtonStyle="danger" selectIcon="minus" />
+                        <PlayerTable players={selectedUserPlayers} onSelect={this.deselectUserPlayer} selectButtonStyle="danger" selectIcon="minus" />
                         <Button bsSize="large" bsStyle="info" block onClick={this.showUserPlayerSelectModal}>Add Player</Button>
+                        <hr/>
+                        <DraftPickTable draftPicks={selectedUserDraftPicks} onSelect={this.deselectUserDraftPick} selectButtonStyle="danger" selectIcon="minus" />
+                        <Button bsSize="large" bsStyle="info" block onClick={this.showUserDraftPicksSelectModal}>Add Draft Pick</Button>                        
                     </Col>
                     <Col mdHidden lgHidden>
                         <hr/>
                     </Col>
                     <Col md={6}>
-                        <TeamSelect teams={teams} selectedTeamId={this.state.selectedCPUTeam.id} onSelect={this.selectTeam}/>
-                        <PlayerTable players={this.state.selectedCPUPlayers} onSelect={this.deselectCPUPlayer} selectButtonStyle="danger" selectIcon="minus" />
+                        <TeamSelect teams={teams} selectedTeamId={selectedCPUTeam.id} onSelect={this.selectTeam}/>
+                        <PlayerTable players={selectedCPUPlayers} onSelect={this.deselectCPUPlayer} selectButtonStyle="danger" selectIcon="minus" />
                         <Button bsSize="large" bsStyle="info" block onClick={this.showCPUPlayerSelectModal}>Add Player</Button>
-                    </Col>
+                        <hr/>
+                        <DraftPickTable draftPicks={selectedCPUDraftPicks} onSelect={this.deselectCPUDraftPick} selectButtonStyle="danger" selectIcon="minus" />
+                        <Button bsSize="large" bsStyle="info" block onClick={this.showCPUDraftPicksSelectModal}>Add Draft Pick</Button>                        
+                    </Col>                    
                 </Row>
                 <hr/>
                 <Row>
@@ -223,7 +315,7 @@ export default class TradingNegotiations extends Component{
                     <Col xs={12}>
                         <Button disabled={!tradeAllowed} bsSize="large" bsStyle="primary" block onClick={this.proposeTrade}>Propose Trade</Button>
                     </Col>
-                </Row>
+                </Row>}
             </PageWrapper>
         );
     }
@@ -233,6 +325,7 @@ export default class TradingNegotiations extends Component{
 function SalaryTable(props){
     const {payroll, salaryIn, salaryOut, payrollAfter, cap, ratings} = props;
     const className = payrollAfter > cap ? 'danger' : 'success';
+    const salaryDifference = salaryIn - salaryOut;
     return (
         <Table>
             <tbody>
@@ -250,7 +343,7 @@ function SalaryTable(props){
                 </tr>
                 <tr>
                     <th>Salary Difference</th>
-                    <td>${salaryIn - salaryOut}M</td>
+                    <td>${salaryDifference}M</td>
                 </tr>
                 <tr className={className}>
                     <th>Payroll After Trade</th>

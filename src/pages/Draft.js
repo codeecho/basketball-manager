@@ -11,7 +11,7 @@ export default function Draft(props){
     return (
         <PageWrapper title={year + ' Draft'}>
             <div>
-                <PlayerTable players={players} />
+                <PlayerTable players={players} defaultSortProperty="potential"/>
             </div>
         </PageWrapper>
     );

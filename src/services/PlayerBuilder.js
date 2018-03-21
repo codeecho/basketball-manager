@@ -24,17 +24,26 @@ export default class PlayerBuilder{
     buildDraftPlayer(year, id, upperBound){
         const name = this.randomizer.getRandomItem(firstNames) + ' ' + this.randomizer.getRandomItem(surnames);
         const age = this.randomizer.getRandomInteger(19, 22);
-        const prime = this.randomizer.getRandomInteger(28, 31);
-        const decline = 2.5;
+        const prime = this.randomizer.getRandomInteger(27, 30);
+        const decline = this.randomizer.getRandomNumber(2, 3);
         const dob = year - age - 1;
         const position = this.randomizer.getRandomItem(positions);
         const stamina = this.randomizer.getRandomInteger(80, 95);
-        const scoring = this.randomizer.getRandomInteger(25, 60);
-        const defense = this.randomizer.getRandomInteger(25, 60);
-        const rebounding = this.randomizer.getRandomInteger(25, 60);
-        const passing = this.randomizer.getRandomInteger(25, 60);
-        const ability = this.calculateAbility(stamina, scoring, defense, rebounding, passing);
-        const potential = this.randomizer.getRandomInteger(ability+5, Math.min(ability+40, Math.max(upperBound, ability)));        
+        let scoring = this.randomizer.getRandomInteger(25, 99);
+        let defense = this.randomizer.getRandomInteger(25, 99);
+        let rebounding = this.randomizer.getRandomInteger(25, 99);
+        let passing = this.randomizer.getRandomInteger(25, 99);
+        let ability = this.calculateAbility(stamina, scoring, defense, rebounding, passing);
+        const potential = this.randomizer.getRandomInteger(50, upperBound);
+        const adjustedAbility = Math.max(Math.min(Math.max(potential - 20, 40), 70) - (6*(22-age)), 40);
+        const fuzzedAbility = this.randomizer.getRandomNumber(adjustedAbility - 1.5, adjustedAbility + 1.5);
+        const delta = fuzzedAbility / ability;
+        scoring = Math.round(scoring * delta);    
+        defense = Math.round(defense * delta);    
+        rebounding = Math.round(rebounding * delta);    
+        passing = Math.round(passing * delta);
+        const calculatedAbility = this.calculateAbility(stamina, scoring, defense, rebounding, passing);
+        console.log(potential, adjustedAbility, fuzzedAbility, calculatedAbility);
         const player = {
             id,
             teamId: UNDRAFTED_TEAM_ID, 
@@ -43,8 +52,8 @@ export default class PlayerBuilder{
             age,
             salary: 2.5, 
             contractExpiry: undefined, 
-            ability,
-            realAbility: ability,
+            ability: calculatedAbility,
+            realAbility: calculatedAbility,
             delta: 0,
             potential,
             prime,

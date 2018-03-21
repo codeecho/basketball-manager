@@ -78,11 +78,11 @@ export function newGame(){
     return { type: NEW_GAME };
 }
 
-export function advance(numberOfRounds, seed){
-    return { type: ADVANCE, numberOfRounds, seed };
+export function advance(numberOfRounds, playThroughPlayoffs, seed){
+    return { type: ADVANCE, numberOfRounds, playThroughPlayoffs, seed };
 }
-export function playNextRound(numberOfRounds, seed){
-    return { type: PLAY_NEXT_ROUND, numberOfRounds, seed };
+export function playNextRound(numberOfRounds, playThroughPlayoffs, seed){
+    return { type: PLAY_NEXT_ROUND, numberOfRounds, playThroughPlayoffs, seed };
 }
 export function doDraft(seed){
     return { type: DO_DRAFT, seed };
@@ -146,11 +146,11 @@ export function serverEvent(action){
 export function serverJoinRoom(room, user, teamId){
     return { type: SERVER_JOIN_ROOM, room, user, metadata: {teamId} };
 }
-export function serverPlayerReady(numberOfRounds){
-    return { type: SERVER_PLAYER_READY, numberOfRounds };
+export function serverPlayerReady(numberOfRounds, playThroughPlayoffs){
+    return { type: SERVER_PLAYER_READY, numberOfRounds, playThroughPlayoffs };
 }
-export function serverAdvance(numberOfRounds, seed){
-    return { type: SERVER_ADVANCE, numberOfRounds, seed };
+export function serverAdvance(numberOfRounds, playThroughPlayoffs, seed){
+    return { type: SERVER_ADVANCE, numberOfRounds, playThroughPlayoffs, seed };
 }
 export function serverGameState(users){
     return { type: SERVER_GAME_STATE, users };

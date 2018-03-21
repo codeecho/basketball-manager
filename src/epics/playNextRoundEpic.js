@@ -13,8 +13,7 @@ const teamService = new TeamService();
 export const playNextRoundEpic = (action$, store) =>
   action$
     .filter(action => action.type === actions.PLAY_NEXT_ROUND)
-    .debounceTime(0)
-    .switchMap(({numberOfRounds, seed}) => {
+    .switchMap(({numberOfRounds, playThroughPlayoffs, seed}) => {
         
         const randomizer = new Randomizer(seed);
         
@@ -83,11 +82,13 @@ export const playNextRoundEpic = (action$, store) =>
         
         if(round + results.length === state.fixtures.length){
             if(state.gameState.stage === GAME_STATE_REGULAR_SEASON){
-                return Observable.concat(
+                let observables = Observable.concat(
                     Observable.of(actions.saveResults(results)),
                     Observable.of(actions.endRegularSeason()),
                     Observable.of(actions.createNextPlayoffRound(true))
                 );
+                if(playThroughPlayoffs) observables = Observable.concat(observables, Observable.of(actions.playNextRound(99, true, randomizer.getRandomNumber())));                
+                return observables;
             }else if(state.gameState.stage === GAME_STATE_PLAYOFFS){
                 if(state.fixtures[round + results.length -1].length === 1){
                     return Observable.concat(
@@ -95,10 +96,12 @@ export const playNextRoundEpic = (action$, store) =>
                         Observable.of(actions.endPlayoffs())
                     );
                 }
-                return Observable.concat(
+                let observables = Observable.concat(
                     Observable.of(actions.saveResults(results)),
                     Observable.of(actions.createNextPlayoffRound())
-                );                   
+                );    
+                if(playThroughPlayoffs) observables = Observable.concat(observables, Observable.of(actions.playNextRound(99, true, randomizer.getRandomNumber())));
+                return observables;
             }
         }
         
@@ -215,7 +218,6 @@ function getStatPerPlayer(randomizer, players, statProperty, resultProperty, tot
         const standoutIndex = randomizer.getRandomWeightedIndex([0.5, 0.25, 0.15, 0.1]);
         usageRates = [0.05, 0.05, 0.05, 0.05, 0.05];
         usageRates[standoutIndex] = 0.8;
-        console.log(resultProperty, players[standoutIndex].name);
     }
     
     players.forEach((player, i) => {

@@ -8,7 +8,7 @@ import PlayerStatsTable from '../components/PlayerStatsTable';
 import PlayerTable from '../containers/PlayerTable';
 import Playoffs from './tabs/Playoffs';
 
-import {standingsTabs, STATS_TAB_ID, RATINGS_TAB_ID, PLAYOFFS_TAB_ID} from './tabs/tabs';
+import {standingsTabs, STATS_TAB_ID, RATINGS_TAB_ID, PLAYOFFS_TAB_ID, HISTORY_TAB_ID} from './tabs/tabs';
 
 export default function Home(props){
     
@@ -21,6 +21,8 @@ export default function Home(props){
             return <PlayerTable players={players} highlightTeam={teamId} limit={50}/>;
         }else if(tab === PLAYOFFS_TAB_ID){
             return <Playoffs {...props}/>
+        }else if(tab === HISTORY_TAB_ID){
+            return <History {...props} />
         }else{
             return (
                 <div>
@@ -52,7 +54,6 @@ export default function Home(props){
 
 function Standing(props){
     const {index, team, played, won, lost, teamId, otherUserTeamIds} = props;
-    const teamHref = `#/team/${team.id}`;
     const isUserTeam = team.id === teamId;
     const isOtherUserTeam = otherUserTeamIds.includes(team.id);
     const classes = isUserTeam ? 'info' : isOtherUserTeam ? 'warning' : undefined;
@@ -66,6 +67,17 @@ function Standing(props){
             <td>{lost}</td>
         </tr>
     )
+}
+
+function History(props){
+    const {champions, teamId} = props;
+    return (
+        <Table striped hover>
+            <tbody>
+                {champions.map(champion => <tr className={teamId === champion.teamId ? 'info': ''}><td>{champion.year}</td><td><TeamLink team={champion.team} /></td></tr>)}
+            </tbody>
+        </Table>
+    );
 }
 
 

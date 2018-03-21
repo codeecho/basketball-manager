@@ -40,7 +40,7 @@ export default class Randomizer{
     }
     
     getRandomInteger(min, max){
-        return Math.round(this.getRandomNumber(min, max));
+        return Math.floor(this.getRandomNumber(min, max+1));
     }
     
     getRandomNumber(min = 0, max = 1){

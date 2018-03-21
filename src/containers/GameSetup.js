@@ -4,7 +4,9 @@ import { loadTestData, loadDemoData, loadBBLData, setTeam } from '../actions';
 
 const mapStateToProps = (state, ownProps) => {
 
-  const {gameState, teams} = state;
+  const {gameState} = state;
+  const teams = state.teams && state.teams.concat();
+  if(teams) teams.sort((a,b) => a.name.localeCompare(b.name));
   const {teamId} = gameState;
 
   return {

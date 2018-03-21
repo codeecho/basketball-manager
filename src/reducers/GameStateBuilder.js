@@ -31,7 +31,16 @@ export default class GameStateBuilder{
                 playersReady: []
             },
             playerRatings: [],
-            playoffs:[]
+            playoffs:[],
+            champions: [],
+            tradedPicks: [
+                {
+                    year: 2019,
+                    round: 1,
+                    teamId: 6,
+                    ownerId: 10
+                }
+            ]
         };
     }
     
