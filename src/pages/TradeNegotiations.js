@@ -280,7 +280,7 @@ export default class TradingNegotiations extends Component{
         return (
             <PageWrapper id="trade-page" title="Trading Block" tabs={tradeTabs} selectedTab={TRADE_TAB_ID}>
                 {!canTrade && <div>The trade deadline has passed</div>}
-                {canTrade && <Row>
+                {canTrade && <div><Row>
                     <Col md={6}>
                         <h5>&nbsp;</h5>
                         <PlayerTable players={selectedUserPlayers} onSelect={this.deselectUserPlayer} selectButtonStyle="danger" selectIcon="minus" />
@@ -315,7 +315,7 @@ export default class TradingNegotiations extends Component{
                     <Col xs={12}>
                         <Button disabled={!tradeAllowed} bsSize="large" bsStyle="primary" block onClick={this.proposeTrade}>Propose Trade</Button>
                     </Col>
-                </Row>}
+                </Row></div>}
             </PageWrapper>
         );
     }
